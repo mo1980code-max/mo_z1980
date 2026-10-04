@@ -54,6 +54,16 @@ import com.digitalclockpro.presentation.common.rememberCurrentTime
 import com.digitalclockpro.widget.FontCatalog
 import androidx.compose.ui.res.stringResource
 import com.digitalclockpro.R
+import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import com.digitalclockpro.domain.model.AnalogFace
+import com.digitalclockpro.domain.model.ClockKind
+import com.digitalclockpro.domain.model.HandMotion
+import com.digitalclockpro.presentation.common.AnalogClock
 
 /** Tab titles as resource ids; resolved with `stringResource` inside the composable. */
 private val TAB_TITLES = listOf(
@@ -115,6 +125,25 @@ fun WidgetStudioScreen(
 @Composable
 private fun LivePreview(config: WidgetConfig, modifier: Modifier = Modifier) {
     val now by rememberCurrentTime(withSeconds = config.showSeconds)
+
+    if (config.clockKind == ClockKind.ANALOG) {
+        Box(
+            modifier = modifier.fillMaxWidth().height(220.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AnalogClock(
+                face = config.analogFace,
+                modifier = Modifier.size(200.dp),
+                // The preview always sweeps so the user can judge the motion they picked.
+                motion = config.handMotion,
+                showSeconds = config.showSecondHand,
+                showNumerals = config.showAnalogNumerals,
+                digitalInsetText = TimeFormatters.formatTime(now, config.use24Hour, false)
+            )
+        }
+        return
+    }
+
     val background = Color(config.backgroundColor).copy(alpha = config.backgroundAlpha / 255f)
     val timeBrush = if (config.gradientEnabled) {
         Brush.horizontalGradient(listOf(Color(config.timeColor), Color(config.gradientEndColor)))
@@ -174,15 +203,121 @@ private fun LivePreview(config: WidgetConfig, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PresetsTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        ClockStyle.entries.forEach { style ->
-            FilterChip(
-                selected = config.preset == style,
-                onClick = { vm.applyPreset(style) },
-                label = { Text(style.displayName) }
-            )
+    // Kind first: digital and analog have entirely different preset catalogues.
+    Text(stringResource(R.string.studio_clock_kind), style = MaterialTheme.typography.titleSmall)
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        ClockKind.entries.forEachIndexed { index, kind ->
+            SegmentedButton(
+                selected = config.clockKind == kind,
+                onClick = { vm.setClockKind(kind) },
+                shape = SegmentedButtonDefaults.itemShape(index, ClockKind.entries.size)
+            ) {
+                Text(
+                    stringResource(
+                        if (kind == ClockKind.DIGITAL) R.string.studio_kind_digital
+                        else R.string.studio_kind_analog
+                    )
+                )
+            }
         }
     }
+
+    Spacer(Modifier.height(12.dp))
+
+    if (config.clockKind == ClockKind.DIGITAL) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ClockStyle.entries.forEach { style ->
+                FilterChip(
+                    selected = config.preset == style,
+                    onClick = { vm.applyPreset(style) },
+                    label = { Text(style.displayName) }
+                )
+            }
+        }
+    } else {
+        AnalogFacesSection(config, vm)
+    }
+}
+
+/** The six bundled dials, each with a live Compose preview of the real face. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AnalogFacesSection(config: WidgetConfig, vm: WidgetStudioViewModel) {
+    Text(stringResource(R.string.studio_analog_face), style = MaterialTheme.typography.titleSmall)
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        AnalogFace.entries.forEach { face ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(vertical = 6.dp)
+                    .clickable { vm.setAnalogFace(face) }
+            ) {
+                Box(
+                    Modifier
+                        .size(72.dp)
+                        .then(
+                            if (config.analogFace == face) Modifier.border(
+                                2.dp, MaterialTheme.colorScheme.primary, CircleShape
+                            ) else Modifier
+                        )
+                        .padding(3.dp)
+                ) {
+                    AnalogClock(
+                        face = face,
+                        modifier = Modifier.fillMaxSize(),
+                        motion = HandMotion.QUARTZ,
+                        showSeconds = config.showSecondHand,
+                        showNumerals = config.showAnalogNumerals
+                    )
+                }
+                Text(
+                    text = stringResource(analogFaceLabel(face)),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+    }
+
+    Spacer(Modifier.height(8.dp))
+    Text(stringResource(R.string.studio_hand_motion), style = MaterialTheme.typography.titleSmall)
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        HandMotion.entries.forEachIndexed { index, motion ->
+            SegmentedButton(
+                selected = config.handMotion == motion,
+                onClick = { vm.update { it.copy(handMotion = motion) } },
+                shape = SegmentedButtonDefaults.itemShape(index, HandMotion.entries.size)
+            ) {
+                Text(
+                    stringResource(
+                        if (motion == HandMotion.QUARTZ) R.string.studio_motion_quartz
+                        else R.string.studio_motion_smooth
+                    )
+                )
+            }
+        }
+    }
+    Text(
+        text = stringResource(R.string.studio_motion_note),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+
+    SwitchRow(stringResource(R.string.studio_show_second_hand), config.showSecondHand) {
+        vm.update { c -> c.copy(showSecondHand = it) }
+    }
+    SwitchRow(stringResource(R.string.studio_show_numerals), config.showAnalogNumerals) {
+        vm.update { c -> c.copy(showAnalogNumerals = it) }
+    }
+}
+
+@StringRes
+private fun analogFaceLabel(face: AnalogFace): Int = when (face) {
+    AnalogFace.SWISS_MINIMAL -> R.string.face_swiss_minimal
+    AnalogFace.CLASSIC_ROMAN -> R.string.face_classic_roman
+    AnalogFace.LUXURY_GOLD -> R.string.face_luxury_gold
+    AnalogFace.NEON_ANALOG -> R.string.face_neon_analog
+    AnalogFace.STEAMPUNK -> R.string.face_steampunk
+    AnalogFace.DIGITAL_HYBRID -> R.string.face_digital_hybrid
 }
 
 @OptIn(ExperimentalLayoutApi::class)

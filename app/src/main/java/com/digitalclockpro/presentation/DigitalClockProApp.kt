@@ -24,6 +24,9 @@ import com.digitalclockpro.presentation.settings.SettingsScreen
 import com.digitalclockpro.presentation.settings.oem.OemSetupScreen
 import com.digitalclockpro.presentation.world.WorldClockScreen
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import com.digitalclockpro.presentation.deskclock.FullScreenClockActivity
+import com.digitalclockpro.presentation.timer.TimerTabScreen
 
 @Composable
 fun DigitalClockProApp(startDestination: TopLevelDestination) {
@@ -64,9 +67,13 @@ fun DigitalClockProApp(startDestination: TopLevelDestination) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(TopLevelDestination.DASHBOARD.route) {
+                val context = LocalContext.current
                 DashboardScreen(
                     onOpenAlarms = { navController.navigate(TopLevelDestination.ALARMS.route) },
-                    onOpenWorldClock = { navController.navigate(TopLevelDestination.WORLD.route) }
+                    onOpenWorldClock = { navController.navigate(TopLevelDestination.WORLD.route) },
+                    // Separate activity, not a nav destination: the desk clock owns the window
+                    // (immersive bars, keep-screen-on, brightness override).
+                    onOpenDeskClock = { context.startActivity(FullScreenClockActivity.intent(context)) }
                 )
             }
             composable(TopLevelDestination.WORLD.route) { WorldClockScreen() }
@@ -76,6 +83,7 @@ fun DigitalClockProApp(startDestination: TopLevelDestination) {
                     onEditAlarm = { id -> navController.navigate(Routes.alarmEdit(id)) }
                 )
             }
+            composable(TopLevelDestination.TIMER.route) { TimerTabScreen() }
             composable(TopLevelDestination.SETTINGS.route) {
                 SettingsScreen(
                     onOpenOemGuide = { navController.navigate(Routes.OEM_SETUP) }

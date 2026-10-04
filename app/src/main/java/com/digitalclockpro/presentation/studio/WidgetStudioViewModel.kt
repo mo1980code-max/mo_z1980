@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.digitalclockpro.domain.model.AnalogFace
+import com.digitalclockpro.domain.model.ClockKind
 
 @HiltViewModel
 class WidgetStudioViewModel @Inject constructor(
@@ -30,6 +32,17 @@ class WidgetStudioViewModel @Inject constructor(
     }
 
     fun update(transform: (WidgetConfig) -> WidgetConfig) = _config.update(transform)
+
+    /** Switches between a digital readout and an analog dial. */
+    fun setClockKind(kind: ClockKind) = _config.update { it.copy(clockKind = kind) }
+
+    /**
+     * Applies an analog face. The face carries its own palette, so the manual colour override is
+     * cleared — otherwise picking a new dial would appear to do nothing.
+     */
+    fun setAnalogFace(face: AnalogFace) = _config.update {
+        it.copy(clockKind = ClockKind.ANALOG, analogFace = face, analogColorsOverridden = false)
+    }
 
     /** Applies a full visual preset in one tap (Presets tab). */
     fun applyPreset(style: ClockStyle) = _config.update { current ->

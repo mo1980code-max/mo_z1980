@@ -273,4 +273,51 @@
     <string name="perm_notifications_body">مطلوب لعرض شاشة المنبّه الكاملة فوق شاشة القفل.</string>
     <string name="perm_battery_title">تجاهل تحسين البطارية</string>
     <string name="perm_battery_body">يمنع توفير الطاقة الصارم من تأخير منبّهاتك.</string>
+    <!-- ============================== الساعة التناظرية ============================== -->
+    <string name="studio_clock_kind">نوع الساعة</string>
+    <string name="studio_kind_digital">رقمية</string>
+    <string name="studio_kind_analog">تناظرية</string>
+    <string name="studio_analog_face">القرص</string>
+    <string name="studio_hand_motion">حركة العقارب</string>
+    <string name="studio_motion_quartz">كوارتز (قفز)</string>
+    <string name="studio_motion_smooth">انسياب متصل</string>
+    <string name="studio_motion_note">الحركة المنسابة تعمل داخل التطبيق وفي ساعة المكتب فقط. أما أدوات الشاشة الرئيسية فتتحرّك مرة كل دقيقة حتى لا تستهلك البطارية.</string>
+    <string name="studio_show_second_hand">عقرب الثواني</string>
+    <string name="studio_show_numerals">الأرقام</string>
+    <string name="face_swiss_minimal">سويسري بسيط</string>
+    <string name="face_classic_roman">روماني كلاسيكي</string>
+    <string name="face_luxury_gold">ذهبي فاخر</string>
+    <string name="face_neon_analog">نيون</string>
+    <string name="face_steampunk">ستيمبانك</string>
+    <string name="face_digital_hybrid">هجين رقمي</string>
+    <string name="widget_analog_label">ساعة عقارب</string>
+    <string name="widget_analog_large_label">ساعة عقارب (كبيرة)</string>
+    <string name="widget_analog_description">قرص ساعة عقارب قابل للتخصيص بستة أوجه، من البسيط السويسري إلى النيون.</string>
+    <string name="widget_analog_large_description">قرص العقارب بحجم 4×4، لصفٍّ كامل من الشاشة الرئيسية.</string>
+    <string name="widget_analog_desc">قرص ساعة عقارب</string>
+
+    <!-- ============================== ساعة المكتب ============================== -->
+    <string name="desk_clock">ساعة المكتب</string>
+    <string name="desk_tap_for_analog">اضغط للعقارب</string>
+    <string name="desk_tap_for_digital">اضغط للرقمية</string>
+    <string name="desk_brightness">السطوع %1$d%%</string>
+    <string name="desk_exit">خروج</string>
+
+    <!-- ============================== المؤقّت وساعة الإيقاف ============================== -->
+    <string name="nav_timer">المؤقّت</string>
+    <string name="timer_tab_timer">المؤقّت</string>
+    <string name="timer_tab_stopwatch">ساعة الإيقاف</string>
+    <string name="timer_start">بدء</string>
+    <string name="timer_pause">إيقاف مؤقت</string>
+    <string name="timer_reset">إعادة ضبط</string>
+    <string name="timer_finished">انتهى الوقت</string>
+    <string name="timer_stop_alert">إيقاف التنبيه</string>
+    <string name="timer_add_minutes">+%1$d دقيقة</string>
+    <string name="timer_hint">أضف دقائق لضبط المؤقّت.</string>
+    <string name="stopwatch_start">بدء</string>
+    <string name="stopwatch_pause">إيقاف مؤقت</string>
+    <string name="stopwatch_lap">لفّة</string>
+    <string name="stopwatch_reset">إعادة ضبط</string>
+    <string name="stopwatch_lap_number">اللفّة %1$d</string>
+    <string name="stopwatch_no_laps">لا توجد لفّات بعد</string>
 </resources>

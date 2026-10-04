@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "DigitalClockPro"
 include(":app")
+include(":clock-engine")

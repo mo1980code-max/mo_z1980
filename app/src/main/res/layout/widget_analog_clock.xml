@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Analog clock widget.
+  The dial is a single Canvas-rendered bitmap (RemoteViews cannot draw vectors or rotate views
+  freely), with an optional caption line below it for date / next alarm / battery.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/analog_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.DigitalClockPro.Widget">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="4dp">
+
+        <ImageView
+            android:id="@+id/analog_dial"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/widget_analog_desc" />
+
+        <TextView
+            android:id="@+id/analog_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="11sp"
+            android:visibility="gone"
+            tools:ignore="SmallSp" />
+    </LinearLayout>
+</FrameLayout>

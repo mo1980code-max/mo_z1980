@@ -12,6 +12,16 @@ data class WidgetConfig(
     val preset: ClockStyle = ClockStyle.SEVEN_SEGMENT,
     val layout: WidgetLayout = WidgetLayout.SIZE_4x2,
 
+    // ---- Analog ----
+    /** Digital readout or analog dial. Chosen on the first tab of the Studio. */
+    val clockKind: ClockKind = ClockKind.DIGITAL,
+    val analogFace: AnalogFace = AnalogFace.SWISS_MINIMAL,
+    val handMotion: HandMotion = HandMotion.QUARTZ,
+    val showSecondHand: Boolean = true,
+    val showAnalogNumerals: Boolean = true,
+    /** Overrides [AnalogFace] colors when the user edits them in the Colors tab. */
+    val analogColorsOverridden: Boolean = false,
+
     // ---- Typography ----
     val fontKey: String = "dseg7_classic",
     /** content:// or file:// Uri of a user-imported .ttf/.otf, null = bundled font. */

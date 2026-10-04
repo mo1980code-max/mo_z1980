@@ -291,4 +291,53 @@
     <string name="perm_notifications_body">Required to show the full-screen alarm on your lock screen.</string>
     <string name="perm_battery_title">Ignore battery optimizations</string>
     <string name="perm_battery_body">Prevents aggressive power saving from delaying your alarms.</string>
+    <!-- ============================== Analog clock ============================== -->
+    <string name="studio_clock_kind">Clock type</string>
+    <string name="studio_kind_digital">Digital</string>
+    <string name="studio_kind_analog">Analog</string>
+    <string name="studio_analog_face">Dial</string>
+    <string name="studio_hand_motion">Hand movement</string>
+    <string name="studio_motion_quartz">Quartz (tick)</string>
+    <string name="studio_motion_smooth">Smooth sweep</string>
+    <string name="studio_motion_note">Smooth sweeping only applies in the app and the desk clock. Home-screen widgets always tick once a minute so they cost no battery.</string>
+    <string name="studio_show_second_hand">Second hand</string>
+    <string name="studio_show_numerals">Numerals</string>
+    <string name="face_swiss_minimal">Swiss Minimal</string>
+    <string name="face_classic_roman">Classic Roman</string>
+    <string name="face_luxury_gold">Luxury Gold</string>
+    <string name="face_neon_analog">Neon</string>
+    <string name="face_steampunk">Steampunk</string>
+    <string name="face_digital_hybrid">Digital Hybrid</string>
+    <string name="widget_analog_label">Analog Clock</string>
+    <string name="widget_analog_large_label">Analog Clock (large)</string>
+    <string name="widget_analog_description">Customizable analog dial with six faces, from Swiss minimal to neon.</string>
+    <string name="widget_analog_large_description">The analog dial at 4x4, for a full row of the home screen.</string>
+    <string name="widget_analog_desc">Analog clock face</string>
+    <string name="widget_next_alarm_prefix" translatable="false">⏰ %1$s</string>
+    <string name="widget_battery_percent" translatable="false">%1$d%%</string>
+
+    <!-- ============================== Desk clock ============================== -->
+    <string name="desk_clock">Desk clock</string>
+    <string name="desk_tap_for_analog">Tap for analog</string>
+    <string name="desk_tap_for_digital">Tap for digital</string>
+    <string name="desk_brightness">Brightness %1$d%%</string>
+    <string name="desk_exit">Exit</string>
+
+    <!-- ============================== Timer &amp; stopwatch ============================== -->
+    <string name="nav_timer">Timer</string>
+    <string name="timer_tab_timer">Timer</string>
+    <string name="timer_tab_stopwatch">Stopwatch</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_reset">Reset</string>
+    <string name="timer_finished">Time\'s up</string>
+    <string name="timer_stop_alert">Stop</string>
+    <string name="timer_add_minutes">+%1$d min</string>
+    <string name="timer_hint">Add minutes to set the timer.</string>
+    <string name="stopwatch_start">Start</string>
+    <string name="stopwatch_pause">Pause</string>
+    <string name="stopwatch_lap">Lap</string>
+    <string name="stopwatch_reset">Reset</string>
+    <string name="stopwatch_lap_number">Lap %1$d</string>
+    <string name="stopwatch_no_laps">No laps yet</string>
 </resources>

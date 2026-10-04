@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,6 +50,7 @@ import com.digitalclockpro.R
 fun DashboardScreen(
     onOpenAlarms: () -> Unit,
     onOpenWorldClock: () -> Unit,
+    onOpenDeskClock: () -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -172,6 +174,12 @@ fun DashboardScreen(
                 Icon(Icons.Filled.Widgets, contentDescription = null)
                 Text(stringResource(R.string.dashboard_world))
             }
+        }
+
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(onClick = onOpenDeskClock, modifier = Modifier.fillMaxWidth(0.7f)) {
+            Icon(Icons.Filled.Fullscreen, contentDescription = null)
+            Text("  " + stringResource(R.string.desk_clock))
         }
 
         Spacer(Modifier.height(20.dp))

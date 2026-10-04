@@ -56,6 +56,9 @@ ksp {
 }
 
 dependencies {
+    // Pure-Kotlin clock geometry / timer / stopwatch engine (no Android dependency).
+    implementation(project(":clock-engine"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)

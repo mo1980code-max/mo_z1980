@@ -127,6 +127,14 @@
         </activity>
 
         <!-- ===== MODULE C : Alarm engine components ===== -->
+        <activity
+            android:name=".presentation.deskclock.FullScreenClockActivity"
+            android:exported="false"
+            android:label="@string/desk_clock"
+            android:screenOrientation="fullUser"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.DigitalClockPro" />
+
         <receiver
             android:name=".alarm.AlarmReceiver"
             android:exported="false"
@@ -176,6 +184,30 @@
                 android:resource="@xml/widget_clock_info" />
         </receiver>
 
+        <receiver
+            android:name=".widget.AnalogClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_analog_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_analog_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.AnalogClockWidgetLargeProvider"
+            android:exported="true"
+            android:label="@string/widget_analog_large_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_analog_large_info" />
+        </receiver>
         <receiver
             android:name=".widget.WorldClockWidgetProvider"
             android:exported="true"

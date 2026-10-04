@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.WatchLater
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.digitalclockpro.R
@@ -18,6 +19,7 @@ enum class TopLevelDestination(
     DASHBOARD("dashboard", R.string.nav_clock, Icons.Filled.WatchLater),
     WORLD("world", R.string.nav_world, Icons.Filled.Public),
     ALARMS("alarms", R.string.nav_alarms, Icons.Filled.Alarm),
+    TIMER("timer", R.string.nav_timer, Icons.Filled.Timer),
     SETTINGS("settings", R.string.nav_settings, Icons.Filled.Settings);
 
     companion object {

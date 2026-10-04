@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Same widget, 4x4 default placement, so both sizes appear in the launcher picker. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="250dp"
+    android:minResizeWidth="150dp"
+    android:minResizeHeight="150dp"
+    android:maxResizeWidth="420dp"
+    android:maxResizeHeight="420dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="4"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_analog_clock"
+    android:previewLayout="@layout/widget_analog_clock"
+    android:configure="com.digitalclockpro.presentation.studio.WidgetConfigActivity"
+    android:description="@string/widget_analog_large_description" />
