@@ -82,6 +82,18 @@
         android:theme="@style/Theme.DigitalClockPro"
         tools:targetApi="35">
 
+        <!-- ===== AdMob ===== -->
+        <!--
+          Google's OFFICIAL TEST App ID (https://developers.google.com/admob/android/quick-start):
+          it only ever serves test ads and cannot generate invalid traffic. MUST stay in sync
+          with AdPolicy.TEST_APP_ID in :clock-engine, and MUST be replaced by the production
+          App ID (AdMob console -> Apps -> App settings) before a Play Store release.
+          The Google Mobile Ads SDK crashes on start when this meta-data is missing.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+
         <!-- ===== Presentation ===== -->
         <activity
             android:name=".presentation.MainActivity"

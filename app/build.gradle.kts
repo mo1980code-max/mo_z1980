@@ -107,6 +107,14 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
+    // AdMob: every eligibility decision lives in the pure AdPolicy (see :clock-engine);
+    // this layer only hosts the views and gathers UMP consent before initializing.
+    implementation(libs.play.services.ads)
+    implementation(libs.google.ump)
+    // ProcessLifecycleOwner: the foreground signal that gates the app-open ad
+    // (https://developers.google.com/admob/android/app-open#listen).
+    implementation(libs.androidx.lifecycle.process)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)

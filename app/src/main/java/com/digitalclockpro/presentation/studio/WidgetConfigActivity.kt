@@ -11,9 +11,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.digitalclockpro.ads.AdsController
+import com.digitalclockpro.clockengine.AdSurface
 import com.digitalclockpro.core.ui.theme.DigitalClockProTheme
 import com.digitalclockpro.presentation.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Widget configuration activity (declared via `android:configure`).
@@ -24,10 +27,16 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class WidgetConfigActivity : ComponentActivity() {
 
+    @Inject lateinit var adsController: AdsController
+
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Widgets (and the studio that configures them) are an ad-free surface forever —
+        // this activity may even be the process entry point when a widget is added to the
+        // home screen, so it must report itself before anything could show an app-open ad.
+        adsController.setSurface(this, AdSurface.WIDGET)
         enableEdgeToEdge()
 
         appWidgetId = intent?.extras?.getInt(

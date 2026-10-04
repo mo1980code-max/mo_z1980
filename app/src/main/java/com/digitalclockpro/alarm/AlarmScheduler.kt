@@ -92,12 +92,16 @@ class AlarmScheduler @Inject constructor(
         )
     }
 
-    /** Tapping the status-bar alarm icon opens the alarm list. */
+    /**
+     * Tapping the status-bar alarm icon opens the alarm list. Marked EXTRA_FROM_ALARM so the
+     * app-open ad is suppressed: this is an alarm-originated open, and AdPolicy vetoes those.
+     */
     private fun showIntent(): PendingIntent = PendingIntent.getActivity(
         context,
         AppIntents.RC_ALARM_BASE,
         Intent(context, MainActivity::class.java)
             .putExtra(AppIntents.EXTRA_START_DESTINATION, "alarms")
+            .putExtra(AppIntents.EXTRA_FROM_ALARM, true)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )

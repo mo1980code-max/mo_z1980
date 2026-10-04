@@ -17,6 +17,12 @@ coroutines = "1.8.1"
 serialization = "1.7.1"
 media3 = "1.4.1"
 desugar = "2.1.2"
+# Google Mobile Ads (AdMob) + UMP consent. play-services-ads must stay on the 24.0.x line:
+# 24.1.0+ requires Kotlin 2.1.0 while this project pins Kotlin 2.0.20. 24.0.0 bundles
+# user-messaging-platform 3.1.0, so the ump pin below is the exact version the ads SDK
+# was released and tested with.
+playServicesAds = "24.0.0"
+ump = "3.1.0"
 junit = "4.13.2"
 androidxJunit = "1.2.1"
 espresso = "3.6.1"
@@ -55,6 +61,9 @@ hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.re
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+google-ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }

@@ -13,6 +13,14 @@ object AppIntents {
     const val EXTRA_WIDGET_ID = "extra_widget_id"
     const val EXTRA_START_DESTINATION = "extra_start_destination"
 
+    /**
+     * Ad gating (see the pure AdPolicy in :clock-engine). Set by the ALARM surfaces that
+     * open MainActivity (status-bar alarm icon) and by widget tap actions, so the app-open
+     * ad can be suppressed for alarm-originated opens without guessing from the destination.
+     */
+    const val EXTRA_FROM_ALARM = "extra_from_alarm"
+    const val EXTRA_FROM_WIDGET = "extra_from_widget"
+
     /** PendingIntent request-code namespaces (avoids collisions between alarm ids and widgets). */
     const val RC_ALARM_BASE = 100_000
     const val RC_SNOOZE_BASE = 200_000
