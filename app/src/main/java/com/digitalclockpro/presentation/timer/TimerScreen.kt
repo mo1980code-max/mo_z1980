@@ -39,6 +39,7 @@ import com.digitalclockpro.R
 import com.digitalclockpro.clockengine.DurationFormatter
 import com.digitalclockpro.clockengine.StopwatchEngine
 import com.digitalclockpro.clockengine.TimerEngine
+import com.digitalclockpro.presentation.chess.ChessClockScreen
 
 /**
  * The "Timer" bottom-navigation destination: a countdown timer and a stopwatch behind two tabs,
@@ -47,7 +48,11 @@ import com.digitalclockpro.clockengine.TimerEngine
 @Composable
 fun TimerTabScreen(viewModel: TimerViewModel = hiltViewModel()) {
     var tab by remember { mutableIntStateOf(0) }
-    val titles = listOf(R.string.timer_tab_timer, R.string.timer_tab_stopwatch)
+    val titles = listOf(
+        R.string.timer_tab_timer,
+        R.string.timer_tab_stopwatch,
+        R.string.timer_tab_chess
+    )
 
     Column(Modifier.fillMaxSize()) {
         PrimaryTabRow(selectedTabIndex = tab) {
@@ -61,7 +66,10 @@ fun TimerTabScreen(viewModel: TimerViewModel = hiltViewModel()) {
         }
         when (tab) {
             0 -> TimerScreen(viewModel)
-            else -> StopwatchScreen(viewModel)
+            1 -> StopwatchScreen(viewModel)
+            // Its own ViewModel: a chess game must survive switching to the stopwatch and back,
+            // and it has nothing to share with the countdown timer.
+            else -> ChessClockScreen()
         }
     }
 }

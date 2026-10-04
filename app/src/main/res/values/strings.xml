@@ -387,4 +387,38 @@
     <string name="widget_dual_pick_city">Choose a city</string>
     <string name="widget_dual_offset_desc">Time difference</string>
     <string name="widget_time_placeholder" translatable="false">--:--</string>
+    <!-- ============================== Chess clock ============================== -->
+    <string name="timer_tab_chess">Chess</string>
+    <string name="chess_player_a">Player A</string>
+    <string name="chess_player_b">Player B</string>
+    <string name="chess_tap_to_start">Tap to start</string>
+    <string name="chess_your_move">Your move</string>
+    <string name="chess_waiting">Waiting</string>
+    <string name="chess_flagged">Out of time</string>
+    <string name="chess_moves">Move %1$d</string>
+    <string name="chess_pause">Pause</string>
+    <string name="chess_resume">Resume</string>
+    <string name="chess_reset">New game</string>
+    <string name="chess_sound_on">Click sound on</string>
+    <string name="chess_sound_off">Click sound off</string>
+    <string name="chess_time_control">Time control</string>
+    <string name="chess_presets">Presets</string>
+    <string name="chess_custom">Custom</string>
+    <string name="chess_base_minutes">Base time: %1$d min</string>
+    <string name="chess_bonus_seconds">Increment or delay: %1$d s</string>
+    <string name="chess_mode">Mode</string>
+    <string name="chess_apply">Apply</string>
+    <string name="chess_category_bullet">Bullet</string>
+    <string name="chess_category_blitz">Blitz</string>
+    <string name="chess_category_rapid">Rapid</string>
+    <string name="chess_category_classical">Classical</string>
+    <string name="chess_type_sudden_death">Sudden death</string>
+    <string name="chess_type_fischer">Fischer increment</string>
+    <string name="chess_type_simple_delay">Simple delay</string>
+    <string name="chess_type_bronstein">Bronstein delay</string>
+    <string name="chess_explain_sudden_death">A fixed allowance. When it runs out, you lose on time.</string>
+    <string name="chess_explain_fischer">The bonus is added after every move you complete, and it builds up.</string>
+    <string name="chess_explain_simple_delay">Your clock stands still for the delay, then starts counting.</string>
+    <string name="chess_explain_bronstein">Your clock runs at once, then the time you used is refunded, up to the delay.</string>
+    <string name="cancel">Cancel</string>
 </resources>
