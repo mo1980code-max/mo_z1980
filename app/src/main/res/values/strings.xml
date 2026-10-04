@@ -422,4 +422,7 @@
     <string name="chess_explain_bronstein">Your clock runs at once, then the time you used is refunded, up to the delay.</string>
     <string name="cancel">Cancel</string>
     <string name="studio_font_substituted">Not installed — shown in a substitute face</string>
+    <string name="analog_clock_description">Analog clock showing %1$s</string>
+    <string name="slide_to_dismiss_action">Dismiss the alarm</string>
+    <string name="dismiss_button">Dismiss alarm</string>
 </resources>

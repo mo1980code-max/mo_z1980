@@ -10,11 +10,13 @@ import android.graphics.Paint
 import android.graphics.Shader
 import android.graphics.Typeface
 import android.util.TypedValue
+import com.digitalclockpro.clockengine.LocaleText
 import com.digitalclockpro.core.util.TimeFormatters
 import com.digitalclockpro.domain.model.ClockStyle
 import com.digitalclockpro.domain.model.WidgetConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.ZonedDateTime
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min
@@ -70,21 +72,27 @@ class ClockWidgetRenderer @Inject constructor(
         canvas.drawText(timeText, widthPx / 2f, baseline, paint)
 
         if (amPm.isNotEmpty()) {
+            val rtl = LocaleText.isRtl(Locale.getDefault())
             val amPaint = Paint(paint).apply {
                 clearShadowLayer()
                 maskFilter = null
                 shader = null
                 color = cfg.accentColor.toInt()
                 textSize = paint.textSize * 0.26f
-                textAlign = Paint.Align.LEFT
+                // Anchor on the side the marker sits on, so it grows away from the time
+                // instead of into it.
+                textAlign = if (rtl) Paint.Align.RIGHT else Paint.Align.LEFT
             }
             val timeWidth = paint.measureText(timeText)
-            canvas.drawText(
-                amPm,
-                (widthPx + timeWidth) / 2f + dp(4),
-                baseline - paint.textSize * 0.55f,
-                amPaint
-            )
+            // The marker belongs on the leading side of the time: right of it in English,
+            // left of it in Arabic. It was hardcoded to the right, so "ص/م" sat on the
+            // trailing side of the digits in every RTL locale.
+            val x = if (rtl) {
+                (widthPx - timeWidth) / 2f - dp(4)
+            } else {
+                (widthPx + timeWidth) / 2f + dp(4)
+            }
+            canvas.drawText(amPm, x, baseline - paint.textSize * 0.55f, amPaint)
         }
         return bitmap
     }
@@ -142,12 +150,17 @@ class ClockWidgetRenderer @Inject constructor(
             }
             textSize = spToPx(cfg.dateTextSizeSp)
         }
-        var text = parts.joinToString("  •  ")
+        // Each fragment is isolated and the list is reversed for RTL. drawText runs the bidi
+        // algorithm, but it derives paragraph direction from the first strong character — and
+        // a numeric date like "04/10" has none, so an Arabic line starting with a date was
+        // laid out as if it were English.
+        val rtl = LocaleText.isRtl(Locale.getDefault())
+        var text = LocaleText.joinForDisplay(parts.map(LocaleText::isolate), "  •  ", rtl)
         while (paint.measureText(text) > widthPx * 0.96f && paint.textSize > spToPx(8f)) {
             paint.textSize -= 1f
         }
         if (paint.measureText(text) > widthPx * 0.96f && parts.size > 1) {
-            text = parts.first()
+            text = LocaleText.isolate(parts.first())
         }
         val metrics = paint.fontMetrics
         canvas.drawText(text, widthPx / 2f, heightPx / 2f - (metrics.ascent + metrics.descent) / 2f, paint)

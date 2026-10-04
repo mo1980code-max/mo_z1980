@@ -13,3 +13,6 @@ captures/
 
 # Hand-built HTML mockup of the UI. Documentation only, not part of the app build.
 /design-preview/
+
+# Static-audit scratch output
+/tools/__pycache__/

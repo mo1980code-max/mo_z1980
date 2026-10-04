@@ -1,5 +1,11 @@
 package com.digitalclockpro.presentation.common
 
+import com.digitalclockpro.R
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,10 +29,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 import com.digitalclockpro.clockengine.ClockEngine
+import com.digitalclockpro.clockengine.LocaleText
 import com.digitalclockpro.domain.model.AnalogFace
 import com.digitalclockpro.domain.model.HandMotion
 import java.time.LocalTime
 import kotlin.math.min
+import java.util.Locale
 
 /**
  * In-app analog dial drawn with Compose `Canvas`.
@@ -51,7 +59,25 @@ fun AnalogClock(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
 
-    Canvas(modifier) {
+    // A Canvas is an empty rectangle to TalkBack: hands and numerals are pixels, not nodes, so
+    // the dial announced nothing at all. Speak the time it is showing instead of describing the
+    // drawing — "analog clock showing 9:41" is what a sighted user actually gets from it.
+    // Recomputed only when the displayed minute changes, not on every sweep frame.
+    val spokenTime = remember(time.hour, time.minute) {
+        "%d:%02d".format(
+            if (time.hour % 12 == 0) 12 else time.hour % 12,
+            time.minute
+        )
+    }
+    val description = stringResource(R.string.analog_clock_description, spokenTime)
+
+    Canvas(
+        modifier.semantics {
+            contentDescription = description
+            // Announced as an image, not a button: nothing here is actionable.
+            role = Role.Image
+        }
+    ) {
         val radius = min(size.width, size.height) / 2f * 0.95f
         val centerX = size.width / 2f
         val centerY = size.height / 2f
@@ -199,12 +225,17 @@ private fun DrawScope.drawNumerals(
         fontSize = (fontSizePx / density).sp
     )
 
+    val locale = Locale.getDefault()
     for (hour in 1..12) {
         val label = when (face.numerals) {
             AnalogFace.NumeralStyle.ROMAN -> ClockEngine.romanNumeral(hour)
-            AnalogFace.NumeralStyle.ARABIC -> hour.toString()
+            // "Arabic numerals" here means the Western 1-12 shapes, not the Arabic language.
+            // Localising them keeps the dial consistent with the digital readout, which goes
+            // through DateTimeFormatter and already renders ٠٩:٤١ under an Arabic locale.
+            // A face showing 1..12 next to a clock showing ٠٩:٤١ looked like two apps.
+            AnalogFace.NumeralStyle.ARABIC -> LocaleText.localizeDigits(hour, locale)
             AnalogFace.NumeralStyle.ARABIC_QUARTERS ->
-                if (hour % 3 == 0) hour.toString() else null
+                if (hour % 3 == 0) LocaleText.localizeDigits(hour, locale) else null
             AnalogFace.NumeralStyle.NONE -> null
         } ?: continue
 

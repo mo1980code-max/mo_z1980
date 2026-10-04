@@ -12,11 +12,13 @@ import android.graphics.Shader
 import android.graphics.SweepGradient
 import android.util.TypedValue
 import com.digitalclockpro.clockengine.ClockEngine
+import com.digitalclockpro.clockengine.LocaleText
 import com.digitalclockpro.core.util.TimeFormatters
 import com.digitalclockpro.domain.model.AnalogFace
 import com.digitalclockpro.domain.model.WidgetConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.ZonedDateTime
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min
@@ -191,12 +193,17 @@ class AnalogClockRenderer @Inject constructor(
         }
 
         val numeralRadius = radius * 0.66f
+        val locale = Locale.getDefault()
         for (hour in 1..12) {
             val label = when (face.numerals) {
                 AnalogFace.NumeralStyle.ROMAN -> ClockEngine.romanNumeral(hour)
-                AnalogFace.NumeralStyle.ARABIC -> hour.toString()
+                // "Arabic numerals" here means the Western 1-12 shapes, not the Arabic language.
+                // Localising them keeps the dial consistent with the digital readout, which goes
+                // through DateTimeFormatter and already renders ٠٩:٤١ under an Arabic locale.
+                // A face showing 1..12 next to a clock showing ٠٩:٤١ looked like two apps.
+                AnalogFace.NumeralStyle.ARABIC -> LocaleText.localizeDigits(hour, locale)
                 AnalogFace.NumeralStyle.ARABIC_QUARTERS ->
-                    if (hour % 3 == 0) hour.toString() else null
+                    if (hour % 3 == 0) LocaleText.localizeDigits(hour, locale) else null
                 AnalogFace.NumeralStyle.NONE -> null
             } ?: continue
 

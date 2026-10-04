@@ -400,4 +400,7 @@
     <string name="chess_explain_bronstein">تعدّ ساعتك فوراً، ثم يُعاد إليك ما استهلكتَه بحدّ أقصى مدة التأخير.</string>
     <string name="cancel">إلغاء</string>
     <string name="studio_font_substituted">غير مثبّت — يُعرض بخط بديل</string>
+    <string name="analog_clock_description">ساعة بعقارب تشير إلى %1$s</string>
+    <string name="slide_to_dismiss_action">إيقاف المنبّه</string>
+    <string name="dismiss_button">إيقاف المنبّه</string>
 </resources>

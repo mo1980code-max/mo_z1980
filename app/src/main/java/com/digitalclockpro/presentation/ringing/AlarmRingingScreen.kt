@@ -1,5 +1,12 @@
 package com.digitalclockpro.presentation.ringing
 
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
+import android.view.accessibility.AccessibilityManager
+import android.content.Context
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -194,8 +201,52 @@ private fun SequenceChallengeUi(state: RingingUiState, onTap: (Int) -> Unit) {
     }
 }
 
+/**
+ * Dismissing the alarm, by drag or by button.
+ *
+ * A horizontal drag is deliberate friction: it is hard to trigger with a sleeve or a cheek while
+ * half asleep, which a plain button is not. That friction is also completely impassable for
+ * anyone using TalkBack — touch exploration consumes the drag, so a screen-reader user had **no
+ * way at all** to turn the alarm off. The gesture carried no semantics either, so the control
+ * was not even announced.
+ *
+ * Two things fix that. When touch exploration is active the slider is replaced by a real button,
+ * because asking a screen-reader user to perform a precision drag is not an accessible design.
+ * And the slider itself now exposes a click action, so assistive tech that is not full
+ * touch exploration can still activate it.
+ */
 @Composable
 private fun SlideToDismiss(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val accessibilityManager = remember(context) {
+        context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+    }
+    // Read live rather than once: TalkBack can be switched on while the alarm is ringing, which
+    // is exactly when someone would reach for it.
+    var touchExploration by remember { mutableStateOf(accessibilityManager.isTouchExplorationEnabled) }
+    DisposableEffect(accessibilityManager) {
+        val listener = AccessibilityManager.TouchExplorationStateChangeListener { enabled ->
+            touchExploration = enabled
+        }
+        accessibilityManager.addTouchExplorationStateChangeListener(listener)
+        onDispose { accessibilityManager.removeTouchExplorationStateChangeListener(listener) }
+    }
+
+    val dismissLabel = stringResource(R.string.slide_to_dismiss_action)
+
+    if (touchExploration) {
+        Button(
+            onClick = onDismiss,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C))
+        ) {
+            Text(stringResource(R.string.dismiss_button), fontSize = 20.sp)
+        }
+        return
+    }
+
     var dragged by remember { mutableStateOf(0f) }
     // RTL: the arrow in the label points left, so the gesture must travel left too. Multiplying
     // the raw delta by the layout direction keeps a single progress value for both directions.
@@ -204,6 +255,13 @@ private fun SlideToDismiss(onDismiss: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
+            // Announce the control and give it an activatable action. Without this the box is
+            // an unlabelled, inert rectangle to every accessibility service.
+            .semantics(mergeDescendants = true) {
+                contentDescription = dismissLabel
+                role = Role.Button
+                onClick(label = dismissLabel) { onDismiss(); true }
+            }
             .pointerInput(directionSign) {
                 detectHorizontalDragGestures(
                     onDragEnd = { if (dragged < size.width * 0.6f) dragged = 0f },
