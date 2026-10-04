@@ -12,6 +12,9 @@ import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import com.digitalclockpro.R
+import com.digitalclockpro.clockengine.RedrawGate
+import com.digitalclockpro.clockengine.WidgetSignature
+import com.digitalclockpro.clockengine.timeBucket
 import com.digitalclockpro.core.util.AppIntents
 import com.digitalclockpro.core.util.TimeFormatters
 import com.digitalclockpro.domain.model.WidgetConfig
@@ -45,9 +48,11 @@ open class AnalogClockWidgetProvider : AppWidgetProvider() {
     @Inject lateinit var configRepository: WidgetConfigRepository
     @Inject lateinit var alarmRepository: AlarmRepository
     @Inject lateinit var renderer: AnalogClockRenderer
+    @Inject lateinit var redrawGate: RedrawGate
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
-        appWidgetIds.forEach { render(context, manager, it) }
+        // Forced: see the note in ClockWidgetProvider.onUpdate.
+        appWidgetIds.forEach { render(context, manager, it, force = true) }
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -57,7 +62,7 @@ open class AnalogClockWidgetProvider : AppWidgetProvider() {
         newOptions: Bundle
     ) {
         // Re-rasterise at the new size so the dial never scales up blurrily.
-        render(context, manager, appWidgetId)
+        render(context, manager, appWidgetId, force = true)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -66,21 +71,52 @@ open class AnalogClockWidgetProvider : AppWidgetProvider() {
             val manager = AppWidgetManager.getInstance(context)
             val ids = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
                 ?: manager.getAppWidgetIds(ComponentName(context, javaClass))
-            ids.forEach { render(context, manager, it) }
+            ids.forEach { render(context, manager, it, force = false) }
         }
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        appWidgetIds.forEach { redrawGate.forget(it) }
         CoroutineScope(Dispatchers.IO).launch {
             appWidgetIds.forEach { configRepository.deleteConfig(it) }
         }
     }
 
-    private fun render(context: Context, manager: AppWidgetManager, appWidgetId: Int) {
+    private fun render(
+        context: Context,
+        manager: AppWidgetManager,
+        appWidgetId: Int,
+        force: Boolean = false
+    ) {
         val pending = runCatching { goAsync() }.getOrNull()
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val config = configRepository.getConfig(appWidgetId)
+
+                // The dial is a rasterised bitmap, so this is the most expensive widget in the
+                // app to redraw. Gating it matters more here than anywhere else.
+                val options = manager.getAppWidgetOptions(appWidgetId)
+                val widthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 150)
+                    .coerceAtLeast(60)
+                val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 150)
+                    .coerceAtLeast(60)
+                val signature = WidgetSignature(
+                    configHash = config.hashCode(),
+                    // The home-screen dial is never swept: it is redrawn once a minute from
+                    // ACTION_TIME_TICK, so a per-minute bucket is the real resolution even when
+                    // the second hand is enabled and drawn at wherever the second happens to be.
+                    timeBucket = timeBucket(
+                        java.time.Instant.now().epochSecond,
+                        showSeconds = false
+                    ),
+                    batteryPercent = if (config.showBattery) batteryPercent(context) else null,
+                    nextAlarmText = if (config.showNextAlarm) nextAlarmLabel(config) else null,
+                    weatherText = null,
+                    widthDp = widthDp,
+                    heightDp = heightDp
+                )
+                if (!redrawGate.shouldRedraw(appWidgetId, signature, force)) return@launch
+
                 manager.updateAppWidget(appWidgetId, buildViews(context, manager, appWidgetId, config))
             } catch (t: Throwable) {
                 Log.e(TAG, "analog render failed for $appWidgetId", t)

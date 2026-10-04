@@ -13,6 +13,8 @@ import com.digitalclockpro.data.prefs.widgetDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import com.digitalclockpro.clockengine.BatteryLevelFilter
+import com.digitalclockpro.clockengine.RedrawGate
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -70,4 +72,15 @@ object WidgetSystemModule {
     @Provides @Singleton
     fun appWidgetManager(@ApplicationContext c: Context): android.appwidget.AppWidgetManager =
         android.appwidget.AppWidgetManager.getInstance(c)
+
+    /**
+     * Process-wide, and it has to be: widget providers are `BroadcastReceiver`s, so a new
+     * instance is constructed for every broadcast. Holding the cache in the provider would
+     * reset it on each delivery and the gate would never match anything.
+     */
+    @Provides @Singleton
+    fun redrawGate(): RedrawGate = RedrawGate()
+
+    @Provides @Singleton
+    fun batteryLevelFilter(): BatteryLevelFilter = BatteryLevelFilter()
 }

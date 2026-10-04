@@ -12,6 +12,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.digitalclockpro.R
+import com.digitalclockpro.clockengine.RedrawGate
+import com.digitalclockpro.clockengine.WidgetSignature
+import com.digitalclockpro.clockengine.timeBucket
 import com.digitalclockpro.core.util.AppIntents
 import com.digitalclockpro.core.util.TimeFormatters
 import com.digitalclockpro.domain.model.ClockStyle
@@ -42,9 +45,13 @@ open class ClockWidgetProvider : AppWidgetProvider() {
     @Inject lateinit var weatherRepository: WeatherRepository
     @Inject lateinit var worldClockRepository: WorldClockRepository
     @Inject lateinit var renderer: ClockWidgetRenderer
+    @Inject lateinit var redrawGate: RedrawGate
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
-        appWidgetIds.forEach { id -> render(context, manager, id) }
+        // force = true: onUpdate fires after a reboot, a launcher restart, or first placement,
+        // and in those cases the launcher is holding nothing for us. Honouring a stale cache
+        // entry here would leave a blank box on the home screen.
+        appWidgetIds.forEach { id -> render(context, manager, id, force = true) }
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -53,8 +60,9 @@ open class ClockWidgetProvider : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle
     ) {
-        // Re-render on resize so the responsive text scaling kicks in.
-        render(context, manager, appWidgetId)
+        // Re-render on resize so the responsive text scaling kicks in. The size is part of the
+        // signature, so force is belt and braces — but a resize must never be dropped.
+        render(context, manager, appWidgetId, force = true)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -63,22 +71,38 @@ open class ClockWidgetProvider : AppWidgetProvider() {
             val manager = AppWidgetManager.getInstance(context)
             val ids = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
                 ?: manager.getAppWidgetIds(android.content.ComponentName(context, javaClass))
-            ids.forEach { render(context, manager, it) }
+            // Our own refresh broadcast: this is the one path the gate is allowed to skip.
+            ids.forEach { render(context, manager, it, force = false) }
         }
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        // Drop the cached signatures too, otherwise the map leaks one entry per removed widget
+        // for the lifetime of the process.
+        appWidgetIds.forEach { redrawGate.forget(it) }
         CoroutineScope(Dispatchers.IO).launch {
             appWidgetIds.forEach { configRepository.deleteConfig(it) }
         }
     }
 
-    protected fun render(context: Context, manager: AppWidgetManager, appWidgetId: Int) {
+    protected fun render(
+        context: Context,
+        manager: AppWidgetManager,
+        appWidgetId: Int,
+        force: Boolean = false
+    ) {
         val result = goAsyncSafe()
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val config = configRepository.getConfig(appWidgetId)
-                val views = buildViews(context, manager, appWidgetId, config)
+
+                // Collect the inputs first and ask the gate before rasterising anything. The
+                // repository reads above are cheap; the bitmap draw and the cross-process
+                // RemoteViews marshal below are not, and they are what this skip avoids.
+                val signature = signatureOf(context, manager, appWidgetId, config)
+                if (!redrawGate.shouldRedraw(appWidgetId, signature, force)) return@launch
+
+                val views = buildViews(context, manager, appWidgetId, config, signature)
                 manager.updateAppWidget(appWidgetId, views)
             } catch (t: Throwable) {
                 android.util.Log.e(TAG, "render failed for $appWidgetId", t)
@@ -88,22 +112,59 @@ open class ClockWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private suspend fun buildViews(
+    /**
+     * Everything that can change the rendered pixels, folded into one comparable value.
+     *
+     * `config.hashCode()` stands in for the whole configuration: [WidgetConfig] is a data class,
+     * so every colour, font, toggle and tap action is already covered and new fields are picked
+     * up automatically instead of being silently forgotten here.
+     */
+    private suspend fun signatureOf(
         context: Context,
         manager: AppWidgetManager,
         appWidgetId: Int,
         config: WidgetConfig
-    ): RemoteViews {
+    ): WidgetSignature {
+        val (widthDp, heightDp) = sizeOf(manager, appWidgetId)
+        return WidgetSignature(
+            configHash = config.hashCode(),
+            timeBucket = timeBucket(
+                java.time.Instant.now().epochSecond,
+                showSeconds = config.showSeconds
+            ),
+            batteryPercent = if (config.showBattery) batteryPercent(context) else null,
+            nextAlarmText = if (config.showNextAlarm) nextAlarmLabel(config) else null,
+            weatherText = if (config.showWeather) weatherLabel(config) else null,
+            widthDp = widthDp,
+            heightDp = heightDp
+        )
+    }
+
+    private fun sizeOf(manager: AppWidgetManager, appWidgetId: Int): Pair<Int, Int> {
         val options = manager.getAppWidgetOptions(appWidgetId)
         val widthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 250)
             .coerceAtLeast(80)
         val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
             .coerceAtLeast(40)
+        return widthDp to heightDp
+    }
+
+    private fun buildViews(
+        context: Context,
+        manager: AppWidgetManager,
+        appWidgetId: Int,
+        config: WidgetConfig,
+        signature: WidgetSignature
+    ): RemoteViews {
+        // Reuses the values already gathered for the signature instead of re-reading the
+        // battery and re-querying alarms and weather a second time per draw.
+        val widthDp = signature.widthDp
+        val heightDp = signature.heightDp
 
         val now = ZonedDateTime.now()
-        val battery = if (config.showBattery) batteryPercent(context) else null
-        val nextAlarm = if (config.showNextAlarm) nextAlarmLabel(config) else null
-        val weather = if (config.showWeather) weatherLabel(config) else null
+        val battery = signature.batteryPercent
+        val nextAlarm = signature.nextAlarmText
+        val weather = signature.weatherText
 
         val payload = ClockWidgetRenderer.Payload(
             config = config,
