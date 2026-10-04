@@ -32,6 +32,9 @@ class AlarmRingingActivity : ComponentActivity() {
             // Always dark + high contrast: never blind a half-asleep user.
             DigitalClockProTheme(themeMode = ThemeMode.DARK, dynamicColor = false, amoledBlack = true) {
                 AlarmRingingScreen(
+                    // The session was cleared by the service (dismissed from the notification,
+                    // auto-silenced, or handled on another device surface) -> just close.
+                    onFinished = { finishAndRemoveTask() },
                     onSnooze = {
                         AlarmService.command(this, AlarmService.ACTION_SNOOZE)
                         finishAndRemoveTask()

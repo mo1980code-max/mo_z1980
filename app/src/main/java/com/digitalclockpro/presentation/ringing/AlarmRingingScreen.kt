@@ -49,12 +49,14 @@ import com.digitalclockpro.presentation.common.rememberCurrentTime
 fun AlarmRingingScreen(
     onSnooze: () -> Unit,
     onDismiss: () -> Unit,
+    onFinished: () -> Unit,
     viewModel: AlarmRingingViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val now by rememberCurrentTime(withSeconds = false)
 
     LaunchedEffect(state.solved) { if (state.solved) onDismiss() }
+    LaunchedEffect(state.finished) { if (state.finished) onFinished() }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
