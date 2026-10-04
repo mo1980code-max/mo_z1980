@@ -10,10 +10,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
+import com.digitalclockpro.ads.AdsController
 import com.digitalclockpro.alarm.AlarmService
 import com.digitalclockpro.core.ui.theme.DigitalClockProTheme
+import com.digitalclockpro.clockengine.AdLaunchOrigin
+import com.digitalclockpro.clockengine.AdSurface
 import com.digitalclockpro.domain.model.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Full-screen alarm UI. Launched either by the full-screen intent (locked device) or directly by
@@ -22,8 +26,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AlarmRingingActivity : ComponentActivity() {
 
+    @Inject lateinit var adsController: AdsController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Double veto, both enforced by the pure AdPolicy: this process was opened BY AN
+        // ALARM (never show an app-open ad), and the ringing screen itself is ad-free
+        // FOREVER — no banner, no full-screen ad, nothing.
+        adsController.onLaunched(AdLaunchOrigin.ALARM)
+        adsController.setSurface(this, AdSurface.ALARM_RINGING)
         showOverLockScreen()
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)

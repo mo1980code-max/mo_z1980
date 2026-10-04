@@ -53,6 +53,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.digitalclockpro.R
+import com.digitalclockpro.ads.AdsController
+import com.digitalclockpro.clockengine.AdSurface
 import com.digitalclockpro.clockengine.ClockEngine
 import com.digitalclockpro.core.ui.theme.DigitalClockProTheme
 import com.digitalclockpro.core.util.TimeFormatters
@@ -63,6 +65,7 @@ import com.digitalclockpro.presentation.common.AnalogClock
 import com.digitalclockpro.presentation.common.rememberCurrentTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
 /**
  * Desk Clock: a full-screen, always-on clock for a bedside dock.
@@ -81,8 +84,13 @@ import kotlinx.coroutines.delay
 @AndroidEntryPoint
 class FullScreenClockActivity : ComponentActivity() {
 
+    @Inject lateinit var adsController: AdsController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Ad-free surface forever (AdPolicy.DESK_CLOCK): no banner here, and the app-open
+        // ad may never cover a bedside clock — including on the foreground return to it.
+        adsController.setSurface(this, AdSurface.DESK_CLOCK)
         enableEdgeToEdge()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 

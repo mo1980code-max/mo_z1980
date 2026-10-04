@@ -62,6 +62,11 @@ DigitalClockPro/
         │   │   │   ├── WidgetUpdater.kt / WidgetTickController.kt / WidgetTickReceiver.kt
         │   │   │   └── glance/GlanceClockWidget.kt
         │   │   │
+        │   │   ├── ads/                        # MODULE D – AdMob hosts + UMP consent
+        │   │   │   ├── AdsController.kt        # UMP → MobileAds.init, app-open ad, surface tracking
+        │   │   │   ├── AdPolicyBanner.kt       # the single banner host (gated by AdPolicy)
+        │   │   │   └── AdLaunchOrigins.kt      # launch Intent → AdLaunchOrigin
+        │   │   │
         │   │   ├── presentation/
         │   │   │   ├── MainActivity.kt, DigitalClockProApp.kt   # nav + bottom bar
         │   │   │   ├── dashboard/  world/  alarms/  settings/
@@ -75,7 +80,7 @@ DigitalClockPro/
         │       ├── layout/widget_clock.xml, widget_world_clock.xml
         │       ├── xml/widget_clock_info.xml, widget_world_info.xml, widget_glance_info.xml
         │       ├── drawable/   values/   values-night/   mipmap-anydpi-v26/
-        │       └── font/                        # ← drop your .ttf files here (see §6)
+        │       └── font/                        # ← drop your .ttf files here (see §10)
         └── test/java/com/digitalclockpro/domain/   # JUnit: next-trigger, timezone, challenges
 ```
 
@@ -135,7 +140,25 @@ BootReceiver: BOOT_COMPLETED | LOCKED_BOOT_COMPLETED | MY_PACKAGE_REPLACED | TIM
 * DST & timezone changes → next trigger always recomputed from `LocalDateTime` + `ZoneId`.
 * Snooze budget (`maxSnoozeCount`) enforced in `SnoozeAlarmUseCase`.
 
-## 5. Reliability on OEM ROMs & custom alarm sounds
+## 5. Module D — ads (AdMob + UMP consent)
+
+**Every eligibility decision lives in one pure file**: `clock-engine/…/AdPolicy.kt` (JVM-tested in
+`AdPolicyTest.kt`); the app layer only translates routes/tabs/intents into its plain inputs.
+
+* **Test IDs only** (Google's official sample account): App ID `…~3347511713` in the manifest
+  `com.google.android.gms.ads.APPLICATION_ID` meta-data, anchored-adaptive banner `…/9214589741`,
+  app-open `…/9257395921` — all pinned as constants in `AdPolicy` and asserted verbatim by tests.
+* **Ad-free forever** on: alarm ringing screen, desk clock, chess clock, alarm editor, OEM guide,
+  widgets (+ widget studio). On those surfaces no `AdView` is even constructed.
+* **App-open ad never shows when the open came from an alarm** (full-screen intent, alarm
+  notification, status-bar alarm icon) — `EXTRA_FROM_ALARM` → `AdLaunchOrigin.ALARM` → veto in
+  `AdPolicy.allowsAppOpenAd()`.
+* **UMP consent before initialization**: `requestConsentInfoUpdate` →
+  `loadAndShowConsentFormIfRequired` → only then `MobileAds.initialize()` (driven from
+  MainActivity so a consent form can never appear over the ringing screen).
+* Full details & the production-swap checklist: **[docs/ADS.md](docs/ADS.md)**.
+
+## 6. Reliability on OEM ROMs & custom alarm sounds
 
 **OEM autostart / power guide** (`core/util/OemPowerSettings.kt`, `presentation/settings/oem/`)
 Detects the vendor from `Build.MANUFACTURER`/`BRAND` (Xiaomi-MIUI/HyperOS, Huawei-EMUI, Samsung
@@ -169,7 +192,7 @@ canonical-path checks. The SAF read grant is taken persistably only while copyin
 `isPlayable()` warns in the editor when a previously chosen sound has disappeared.
 All of these rules are pure functions in `RingtoneFileRules` with JVM unit tests.
 
-## 6. Localization & RTL
+## 7. Localization & RTL
 
 All user-facing copy lives in `res/values/strings.xml`, with a hand-written Arabic translation in
 `res/values-ar/strings.xml` (key parity is enforced; only genuinely untranslatable values — format
@@ -184,7 +207,7 @@ RTL: `supportsRtl="true"`, no `Left`/`Right`/absolute modifiers anywhere, and th
 gesture on the ringing screen mirrors its direction from `LocalLayoutDirection`, so the swipe
 follows the arrow in both LTR and RTL.
 
-## 7. Ringtone preview
+## 8. Ringtone preview
 
 `RingtonePreviewPlayer` is a separate `MediaPlayer`-based singleton — never `AlarmSoundPlayer`,
 which is owned by `AlarmService` and may be mid-ramp on a live alarm. It plays at most 8 seconds,
@@ -192,13 +215,13 @@ stops itself on completion or timeout, stops when another sound is selected, whe
 saved, and when the editor leaves the composition (`DisposableEffect`), and refuses to start at all
 while `AlarmSessionManager.isRinging` is true.
 
-## 8. Permissions
+## 9. Permissions
 
 `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, `POST_NOTIFICATIONS`, `USE_FULL_SCREEN_INTENT`,
 `RECEIVE_BOOT_COMPLETED`, `VIBRATE`, `WAKE_LOCK`, `FOREGROUND_SERVICE`,
 `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, `FOREGROUND_SERVICE_SPECIAL_USE`, `INTERNET` (weather, optional).
 
-## 9. Build & run
+## 10. Build & run
 
 ```bash
 # Android Studio Ladybug+ : File ▸ Open ▸ this folder, then Run ▸ app

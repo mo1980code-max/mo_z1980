@@ -22,6 +22,7 @@ import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.digitalclockpro.R
+import com.digitalclockpro.clockengine.AdSurface
 import com.digitalclockpro.clockengine.DurationFormatter
 import com.digitalclockpro.clockengine.StopwatchEngine
 import com.digitalclockpro.clockengine.TimerEngine
@@ -44,15 +46,31 @@ import com.digitalclockpro.presentation.chess.ChessClockScreen
 /**
  * The "Timer" bottom-navigation destination: a countdown timer and a stopwatch behind two tabs,
  * sharing one [TimerViewModel] so both keep running when the user switches between them.
+ *
+ * [onSurfaceChanged] reports the active tab as an [AdSurface]: the chess clock is an ad-free
+ * surface, so the banner (and the app-open-ad gate) must know the moment a game starts.
  */
 @Composable
-fun TimerTabScreen(viewModel: TimerViewModel = hiltViewModel()) {
+fun TimerTabScreen(
+    onSurfaceChanged: (AdSurface) -> Unit = {},
+    viewModel: TimerViewModel = hiltViewModel()
+) {
     var tab by remember { mutableIntStateOf(0) }
     val titles = listOf(
         R.string.timer_tab_timer,
         R.string.timer_tab_stopwatch,
         R.string.timer_tab_chess
     )
+
+    LaunchedEffect(tab) {
+        onSurfaceChanged(
+            when (tab) {
+                1 -> AdSurface.STOPWATCH
+                2 -> AdSurface.CHESS_CLOCK
+                else -> AdSurface.TIMER
+            }
+        )
+    }
 
     Column(Modifier.fillMaxSize()) {
         PrimaryTabRow(selectedTabIndex = tab) {

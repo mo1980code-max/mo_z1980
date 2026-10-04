@@ -36,6 +36,9 @@ object WidgetTapActions {
     private fun main(context: Context, destination: String) =
         Intent(context, MainActivity::class.java)
             .putExtra(AppIntents.EXTRA_START_DESTINATION, destination)
+            // Widget-originated open: allowed to show the app-open ad (only ALARM opens are
+            // vetoed), but tagged so AdPolicy sees the real launch origin.
+            .putExtra(AppIntents.EXTRA_FROM_WIDGET, true)
 
     private fun calendar(): Intent =
         Intent(Intent.ACTION_VIEW).setData(

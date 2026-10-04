@@ -4,6 +4,9 @@
  * Deliberately a `java-library` with **no Android dependency**: all clock geometry, tick cadence,
  * burn-in displacement, timer and stopwatch state live here, so they can be unit-tested on the JVM
  * in milliseconds and reused identically by the Compose UI and by the Canvas widget renderer.
+ * The ad-eligibility policy ([com.digitalclockpro.clockengine.AdPolicy]) lives here for the same
+ * reason: ad allow/deny rules are product logic that must survive a JVM test run, not live
+ * untested inside the Android layer.
  */
 plugins {
     alias(libs.plugins.kotlin.jvm)
