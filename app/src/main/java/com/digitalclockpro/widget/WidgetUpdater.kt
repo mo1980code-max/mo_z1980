@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Single place that pokes every placed widget (digital, analog, world clock and Glance). */
+/** Single place that pokes every placed widget (digital, analog, world, dual and Glance). */
 @Singleton
 class WidgetUpdater @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -20,7 +20,8 @@ class WidgetUpdater @Inject constructor(
         ClockWidgetProvider::class.java,
         AnalogClockWidgetProvider::class.java,
         AnalogClockWidgetLargeProvider::class.java,
-        WorldClockWidgetProvider::class.java
+        WorldClockWidgetProvider::class.java,
+        DualClockWidgetProvider::class.java
     )
 
     fun refreshAll() {

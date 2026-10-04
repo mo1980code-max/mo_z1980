@@ -320,4 +320,49 @@
     <string name="stopwatch_reset">إعادة ضبط</string>
     <string name="stopwatch_lap_number">اللفّة %1$d</string>
     <string name="stopwatch_no_laps">لا توجد لفّات بعد</string>
+    <!-- ============================== المرحلة 2: الأنماط الرقمية ============================== -->
+    <string name="style_seven_segment">شرائح سباعية LED</string>
+    <string name="style_cyberpunk_neon">نيون سايبربانك</string>
+    <string name="style_dot_matrix">مصفوفة نقطية LED</string>
+    <string name="style_minimal_mono">أحادي المسافة البسيط</string>
+    <string name="style_retro_flip">ساعة قلّابة قديمة</string>
+    <string name="style_amoled_black">أسود AMOLED خالص</string>
+    <string name="style_glassmorphism">زجاج ضبابي</string>
+    <string name="style_split_flap">لوحة مطار قلّابة</string>
+    <string name="style_nixie_tube">أنابيب نيكسي</string>
+    <string name="style_lcd_segment">شاشة كريستال LCD</string>
+    <string name="style_led_matrix">مصفوفة LED</string>
+    <string name="style_retro_terminal">شاشة طرفية قديمة</string>
+
+    <!-- ============================== المرحلة 2: توقيت العالم ============================== -->
+    <string name="world_same_time">نفس توقيتك</string>
+    <string name="world_diff_ahead">يتقدّمك بـ %1$s</string>
+    <string name="world_diff_behind">يتأخّر عنك بـ %1$s</string>
+    <string name="world_duration_h">%1$d ساعة</string>
+    <string name="world_duration_m">%1$d دقيقة</string>
+    <string name="world_duration_hm">%1$d ساعة و%2$d دقيقة</string>
+    <string name="day_yesterday">أمس</string>
+    <string name="day_today">اليوم</string>
+    <string name="day_tomorrow">غداً</string>
+    <string name="world_comparison_title">مقارنة جنباً إلى جنب</string>
+
+    <!-- ============================== المرحلة 2: حاسبة وقت الاجتماع ============================== -->
+    <string name="meeting_show">ابحث عن وقت اجتماع</string>
+    <string name="meeting_hide">إخفاء حاسبة الاجتماع</string>
+    <string name="meeting_title">أفضل وقت للاجتماع</string>
+    <string name="meeting_subtitle">تقاطع ساعات العمل، من %1$d:00 إلى %2$d:00 في كل مدينة.</string>
+    <string name="meeting_hours_range">%1$d–%2$d</string>
+    <string name="meeting_previous_day">اليوم السابق</string>
+    <string name="meeting_next_day">اليوم التالي</string>
+    <string name="meeting_need_cities">اختر مدينة واحدة على الأقل لمقارنتها بتوقيتك.</string>
+    <string name="meeting_no_window">لا توجد ساعة عمل مشتركة في هذا اليوم.</string>
+    <string name="meeting_partial_warning">لا توجد فترة تناسب الجميع. هذه أفضل التقاطعات الجزئية.</string>
+    <string name="meeting_window_meta">%1$d س %2$02d د · %3$d من %4$d</string>
+
+    <!-- ============================== المرحلة 2: ويدجت الساعة المزدوجة ============================== -->
+    <string name="widget_dual_label">ساعة مزدوجة</string>
+    <string name="widget_dual_description">توقيتك وتوقيت مدينة أخرى جنباً إلى جنب في ويدجت 4×1.</string>
+    <string name="widget_dual_here">هنا</string>
+    <string name="widget_dual_pick_city">اختر مدينة</string>
+    <string name="widget_dual_offset_desc">فرق التوقيت</string>
 </resources>

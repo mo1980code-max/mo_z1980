@@ -76,15 +76,35 @@ data class WidgetConfig(
     val tapWeather: TapAction = TapAction.OPEN_WEATHER
 )
 
+/**
+ * Visual presets for the digital clock.
+ *
+ * No display name here on purpose: the label lives in `strings.xml` and is resolved in the
+ * presentation layer, so the catalogue is translatable. The enum is serialized **by name**, so
+ * entries may be appended freely but must never be renamed or reordered away — an unknown name
+ * would fail to deserialize a widget the user already placed.
+ */
 @Serializable
-enum class ClockStyle(val displayName: String) {
-    SEVEN_SEGMENT("7-Segment LED"),
-    CYBERPUNK_NEON("Cyberpunk Neon"),
-    DOT_MATRIX("Dot Matrix LED"),
-    MINIMAL_MONO("Minimalist Mono"),
-    RETRO_FLIP("Retro Flip Clock"),
-    AMOLED_BLACK("AMOLED Pure Black"),
-    GLASSMORPHISM("Frosted Glass")
+enum class ClockStyle {
+    SEVEN_SEGMENT,
+    CYBERPUNK_NEON,
+    DOT_MATRIX,
+    MINIMAL_MONO,
+    RETRO_FLIP,
+    AMOLED_BLACK,
+    GLASSMORPHISM,
+
+    // ---- Phase 2 ----
+    /** Airport departure board: every character sits on a hinged flap card. */
+    SPLIT_FLAP,
+    /** Cold-war cathode tubes with an orange glow inside a glass envelope. */
+    NIXIE_TUBE,
+    /** Liquid-crystal panel: the unlit "88:88" segments stay faintly visible behind the time. */
+    LCD_SEGMENT,
+    /** A real LED panel – each pixel is drawn as its own square dot. */
+    LED_MATRIX,
+    /** Green/amber phosphor terminal with CRT scanlines and a blinking prompt. */
+    RETRO_TERMINAL
 }
 
 @Serializable

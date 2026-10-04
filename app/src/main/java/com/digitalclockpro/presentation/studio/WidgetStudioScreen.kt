@@ -230,7 +230,7 @@ private fun PresetsTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
                 FilterChip(
                     selected = config.preset == style,
                     onClick = { vm.applyPreset(style) },
-                    label = { Text(style.displayName) }
+                    label = { Text(stringResource(clockStyleLabel(style))) }
                 )
             }
         }
@@ -308,6 +308,22 @@ private fun AnalogFacesSection(config: WidgetConfig, vm: WidgetStudioViewModel) 
     SwitchRow(stringResource(R.string.studio_show_numerals), config.showAnalogNumerals) {
         vm.update { c -> c.copy(showAnalogNumerals = it) }
     }
+}
+
+@StringRes
+private fun clockStyleLabel(style: ClockStyle): Int = when (style) {
+    ClockStyle.SEVEN_SEGMENT -> R.string.style_seven_segment
+    ClockStyle.CYBERPUNK_NEON -> R.string.style_cyberpunk_neon
+    ClockStyle.DOT_MATRIX -> R.string.style_dot_matrix
+    ClockStyle.MINIMAL_MONO -> R.string.style_minimal_mono
+    ClockStyle.RETRO_FLIP -> R.string.style_retro_flip
+    ClockStyle.AMOLED_BLACK -> R.string.style_amoled_black
+    ClockStyle.GLASSMORPHISM -> R.string.style_glassmorphism
+    ClockStyle.SPLIT_FLAP -> R.string.style_split_flap
+    ClockStyle.NIXIE_TUBE -> R.string.style_nixie_tube
+    ClockStyle.LCD_SEGMENT -> R.string.style_lcd_segment
+    ClockStyle.LED_MATRIX -> R.string.style_led_matrix
+    ClockStyle.RETRO_TERMINAL -> R.string.style_retro_terminal
 }
 
 @StringRes

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  4x1 dual-zone widget: "here" on the left, one tracked city on the right, with the signed
+  UTC offset between them. Plain TextViews (no bitmap) because at 4x1 there is no room for the
+  decorative styles and RemoteViews text costs far less memory per update.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dual_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg_default"
+    android:theme="@style/Theme.DigitalClockPro.Widget">
+
+    <ImageView
+        android:id="@+id/dual_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:importantForAccessibility="no"
+        android:src="@drawable/widget_bg_surface" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <!-- left: the user's own zone -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dual_left_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="12sp"
+                android:text="@string/widget_dual_here" />
+
+            <TextView
+                android:id="@+id/dual_left_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:text="@string/widget_time_placeholder" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dual_offset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:maxLines="1"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:contentDescription="@string/widget_dual_offset_desc" />
+
+        <!-- right: the tracked city -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <TextView
+                android:id="@+id/dual_right_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:textSize="12sp"
+                android:text="@string/widget_dual_pick_city" />
+
+            <TextView
+                android:id="@+id/dual_right_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:gravity="end"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:text="@string/widget_time_placeholder" />
+
+            <TextView
+                android:id="@+id/dual_right_meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:gravity="end"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

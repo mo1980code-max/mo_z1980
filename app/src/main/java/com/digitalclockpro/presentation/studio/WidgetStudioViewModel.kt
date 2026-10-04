@@ -85,6 +85,61 @@ class WidgetStudioViewModel @Inject constructor(
                 backgroundColor = 0xFFFFFFFF, backgroundAlpha = 60, cornerRadiusDp = 28f,
                 borderEnabled = true, borderColor = 0x59FFFFFF
             )
+
+            // ---- Phase 2 ----
+
+            // The card colour IS the background here: StyleRenderers paints each flap with
+            // backgroundColor, so the widget's own backdrop is left nearly opaque behind it.
+            ClockStyle.SPLIT_FLAP -> current.copy(
+                preset = style, clockKind = ClockKind.DIGITAL, fontKey = "inter_tight",
+                timeColor = 0xFFF2F2F2, dateColor = 0xFFB0B0B0, accentColor = 0xFFFFC400,
+                backgroundColor = 0xFF27272B, backgroundAlpha = 255, cornerRadiusDp = 10f,
+                glowEnabled = false, shadowEnabled = true, shadowDx = 0f, shadowDy = 2f,
+                shadowRadius = 3f, gradientEnabled = false, frostedGlass = false,
+                borderEnabled = false, letterSpacing = 0f, showSeconds = false
+            )
+
+            // Nixie digits are warm orange on near-black; a big glow radius is the point of
+            // the style rather than an accident.
+            ClockStyle.NIXIE_TUBE -> current.copy(
+                preset = style, clockKind = ClockKind.DIGITAL, fontKey = "dseg7_classic",
+                timeColor = 0xFFFF9B3D, dateColor = 0xFFB4702F, accentColor = 0xFFFFC98A,
+                backgroundColor = 0xFF140C06, backgroundAlpha = 255, cornerRadiusDp = 18f,
+                glowEnabled = true, glowRadius = 20f, shadowEnabled = false,
+                gradientEnabled = false, frostedGlass = false, borderEnabled = false
+            )
+
+            // Dark grey on an olive backlight, no glow: an LCD is reflective, it never emits.
+            ClockStyle.LCD_SEGMENT -> current.copy(
+                preset = style, clockKind = ClockKind.DIGITAL, fontKey = "dseg7_classic",
+                timeColor = 0xFF1C2410, dateColor = 0xFF39451F, accentColor = 0xFF1C2410,
+                backgroundColor = 0xFFA9BA7F, backgroundAlpha = 255, cornerRadiusDp = 8f,
+                glowEnabled = false, shadowEnabled = false, gradientEnabled = false,
+                frostedGlass = false, borderEnabled = true, borderColor = 0xFF5A6340,
+                borderWidthDp = 2f, letterSpacing = 0.06f
+            )
+
+            // The 5x7 bitmap font is drawn dot by dot, so fontKey is irrelevant for the time;
+            // it still applies to the info line underneath.
+            ClockStyle.LED_MATRIX -> current.copy(
+                preset = style, clockKind = ClockKind.DIGITAL, fontKey = "led_dot_matrix",
+                timeColor = 0xFFFF2D2D, dateColor = 0xFFB71C1C, accentColor = 0xFFFF2D2D,
+                backgroundColor = 0xFF060608, backgroundAlpha = 255, cornerRadiusDp = 6f,
+                glowEnabled = true, glowRadius = 9f, shadowEnabled = false,
+                gradientEnabled = false, frostedGlass = false, borderEnabled = false,
+                showSeconds = false
+            )
+
+            // Phosphor green; the amber variant is one colour-picker tap away.
+            ClockStyle.RETRO_TERMINAL -> current.copy(
+                preset = style, clockKind = ClockKind.DIGITAL, fontKey = "jetbrains_mono",
+                timeColor = 0xFF33FF66, dateColor = 0xFF1F9940, accentColor = 0xFF33FF66,
+                backgroundColor = 0xFF061006, backgroundAlpha = 255, cornerRadiusDp = 14f,
+                glowEnabled = true, glowRadius = 12f, shadowEnabled = false,
+                gradientEnabled = false, frostedGlass = false, borderEnabled = true,
+                borderColor = 0xFF1F2B1F, borderWidthDp = 2f, use24Hour = true,
+                showSeconds = true, letterSpacing = 0.06f
+            )
         }
     }
 

@@ -52,6 +52,12 @@ class ClockWidgetRenderer @Inject constructor(
         val timeText = TimeFormatters.formatTime(payload.now, cfg.use24Hour, cfg.showSeconds)
         val amPm = if (!cfg.use24Hour && cfg.showAmPm) TimeFormatters.amPm(payload.now) else ""
 
+        // The decorative styles own their whole canvas: a flap board, a tube rack or an LED
+        // panel cannot be expressed as "a string with effects", so they short-circuit here.
+        if (drawDecoratedStyle(canvas, timeText, cfg, widthPx.toFloat(), heightPx.toFloat())) {
+            return bitmap
+        }
+
         val paint = basePaint(cfg).apply {
             typeface = resolveTypeface(cfg)
             textSize = fittingTextSize(timeText, this, widthPx * 0.94f, heightPx * 0.8f, cfg)
@@ -83,6 +89,35 @@ class ClockWidgetRenderer @Inject constructor(
         return bitmap
     }
 
+    /**
+     * Dispatches to [StyleRenderers] for the Phase-2 presets.
+     * Returns false for the classic styles so the generic text path runs instead.
+     */
+    private fun drawDecoratedStyle(
+        canvas: Canvas,
+        timeText: String,
+        cfg: WidgetConfig,
+        width: Float,
+        height: Float
+    ): Boolean {
+        val density = context.resources.displayMetrics.density
+        val typeface = resolveTypeface(cfg)
+        when (cfg.preset) {
+            ClockStyle.SPLIT_FLAP ->
+                StyleRenderers.drawSplitFlap(canvas, timeText, cfg, width, height, typeface, density)
+            ClockStyle.NIXIE_TUBE ->
+                StyleRenderers.drawNixie(canvas, timeText, cfg, width, height, typeface, density)
+            ClockStyle.LCD_SEGMENT ->
+                StyleRenderers.drawLcd(canvas, timeText, cfg, width, height, typeface)
+            ClockStyle.LED_MATRIX ->
+                StyleRenderers.drawLedMatrix(canvas, timeText, cfg, width, height)
+            ClockStyle.RETRO_TERMINAL ->
+                StyleRenderers.drawTerminal(canvas, timeText, cfg, width, height)
+            else -> return false
+        }
+        return true
+    }
+
     /** Secondary line: date • battery • next alarm • weather. */
     fun renderInfoLine(payload: Payload): Bitmap? {
         val cfg = payload.config
@@ -101,8 +136,10 @@ class ClockWidgetRenderer @Inject constructor(
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = cfg.dateColor.toInt()
             textAlign = Paint.Align.CENTER
-            typeface = if (cfg.preset == ClockStyle.MINIMAL_MONO) Typeface.MONOSPACE
-            else resolveTypeface(cfg)
+            typeface = when (cfg.preset) {
+                ClockStyle.MINIMAL_MONO, ClockStyle.RETRO_TERMINAL -> Typeface.MONOSPACE
+                else -> resolveTypeface(cfg)
+            }
             textSize = spToPx(cfg.dateTextSizeSp)
         }
         var text = parts.joinToString("  •  ")

@@ -221,6 +221,19 @@
                 android:resource="@xml/widget_world_info" />
         </receiver>
 
+        <receiver
+            android:name=".widget.DualClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_dual_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_dual_info" />
+        </receiver>
+
         <!-- Glance-powered Material You widget -->
         <receiver
             android:name=".widget.glance.GlanceClockWidgetReceiver"

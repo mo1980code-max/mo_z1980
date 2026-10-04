@@ -10,6 +10,7 @@ import android.widget.RemoteViews
 import com.digitalclockpro.R
 import com.digitalclockpro.core.util.AppIntents
 import com.digitalclockpro.core.util.TimeFormatters
+import com.digitalclockpro.core.util.WorldClockLabels
 import com.digitalclockpro.domain.model.SavedCity
 import com.digitalclockpro.domain.model.TapAction
 import com.digitalclockpro.domain.repository.WidgetConfigRepository
@@ -86,7 +87,13 @@ class WorldClockWidgetProvider : AppWidgetProvider() {
                         setTextColor(timeIds[index], config.timeColor.toInt())
                         setTextViewText(
                             metaIds[index],
-                            "${if (city.isDaytime(now)) "☀" else "☾"} ${city.utcOffsetLabel(now)} · ${city.dayLabel(homeZone, now)}"
+                            buildString {
+                                append(if (city.isDaytime(now)) "\u2600" else "\u263E")
+                                append(' ')
+                                append(city.utcOffsetLabel(now))
+                                append(context.getString(R.string.bullet_separator))
+                                append(WorldClockLabels.dayOffset(context, city, homeZone, now))
+                            }
                         )
                         setTextColor(metaIds[index], config.dateColor.toInt())
                     }

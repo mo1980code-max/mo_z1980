@@ -340,4 +340,50 @@
     <string name="stopwatch_reset">Reset</string>
     <string name="stopwatch_lap_number">Lap %1$d</string>
     <string name="stopwatch_no_laps">No laps yet</string>
+    <!-- ============================== Phase 2: digital styles ============================== -->
+    <string name="style_seven_segment">7-Segment LED</string>
+    <string name="style_cyberpunk_neon">Cyberpunk Neon</string>
+    <string name="style_dot_matrix">Dot Matrix LED</string>
+    <string name="style_minimal_mono">Minimalist Mono</string>
+    <string name="style_retro_flip">Retro Flip Clock</string>
+    <string name="style_amoled_black">AMOLED Pure Black</string>
+    <string name="style_glassmorphism">Frosted Glass</string>
+    <string name="style_split_flap">Split-Flap Board</string>
+    <string name="style_nixie_tube">Nixie Tubes</string>
+    <string name="style_lcd_segment">LCD Segment</string>
+    <string name="style_led_matrix">LED Matrix</string>
+    <string name="style_retro_terminal">Retro Terminal</string>
+
+    <!-- ============================== Phase 2: world clock ============================== -->
+    <string name="world_same_time">Same time as you</string>
+    <string name="world_diff_ahead">%1$s ahead of you</string>
+    <string name="world_diff_behind">%1$s behind you</string>
+    <string name="world_duration_h">%1$d hr</string>
+    <string name="world_duration_m">%1$d min</string>
+    <string name="world_duration_hm">%1$d hr %2$d min</string>
+    <string name="day_yesterday">Yesterday</string>
+    <string name="day_today">Today</string>
+    <string name="day_tomorrow">Tomorrow</string>
+    <string name="world_comparison_title">Side by side</string>
+
+    <!-- ============================== Phase 2: meeting planner ============================== -->
+    <string name="meeting_show">Find a meeting time</string>
+    <string name="meeting_hide">Hide the meeting planner</string>
+    <string name="meeting_title">Best time to meet</string>
+    <string name="meeting_subtitle">Overlapping working hours, %1$d:00 to %2$d:00 in every city.</string>
+    <string name="meeting_hours_range">%1$d–%2$d</string>
+    <string name="meeting_previous_day">Previous day</string>
+    <string name="meeting_next_day">Next day</string>
+    <string name="meeting_need_cities">Pick at least one city to compare with your own time.</string>
+    <string name="meeting_no_window">No working hour is shared on this day.</string>
+    <string name="meeting_partial_warning">No slot works for everyone. These are the best partial matches.</string>
+    <string name="meeting_window_meta">%1$dh %2$02dm · %3$d of %4$d</string>
+
+    <!-- ============================== Phase 2: dual clock widget ============================== -->
+    <string name="widget_dual_label">Dual Clock</string>
+    <string name="widget_dual_description">Your time and one other city side by side in a 4x1 widget.</string>
+    <string name="widget_dual_here">Here</string>
+    <string name="widget_dual_pick_city">Choose a city</string>
+    <string name="widget_dual_offset_desc">Time difference</string>
+    <string name="widget_time_placeholder" translatable="false">--:--</string>
 </resources>

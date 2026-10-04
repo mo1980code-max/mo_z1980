@@ -169,6 +169,11 @@ open class ClockWidgetProvider : AppWidgetProvider() {
         ClockStyle.AMOLED_BLACK -> R.drawable.widget_bg_amoled
         ClockStyle.CYBERPUNK_NEON -> R.drawable.widget_bg_neon
         ClockStyle.RETRO_FLIP -> R.drawable.widget_bg_flip
+        ClockStyle.SPLIT_FLAP -> R.drawable.widget_bg_splitflap
+        ClockStyle.NIXIE_TUBE -> R.drawable.widget_bg_nixie
+        ClockStyle.LCD_SEGMENT -> R.drawable.widget_bg_lcd
+        ClockStyle.LED_MATRIX -> R.drawable.widget_bg_matrix
+        ClockStyle.RETRO_TERMINAL -> R.drawable.widget_bg_terminal
         else -> R.drawable.widget_bg_default
     }
 
