@@ -92,7 +92,7 @@
     <!-- ============================== الساعة العالمية ============================== -->
     <string name="world_clock">الساعة العالمية</string>
     <string name="add_city">إضافة مدينة</string>
-    <string name="search_cities">ابحث في أكثر من 10,000 مدينة…</string>
+    <string name="search_cities">ابحث عن مدينة أو منطقة زمنية…</string>
     <string name="time_travel">السفر عبر الوقت</string>
     <string name="reset_to_now">الآن</string>
     <string name="world_now_plus_offset">الآن + الفارق</string>
@@ -211,7 +211,7 @@
     <string name="tab_layout">التخطيط</string>
     <string name="tab_tap_actions">إجراءات اللمس</string>
     <string name="save_widget">حفظ الأداة</string>
-    <string name="studio_bundled_fonts">الخطوط المدمجة (%1$d)</string>
+    <string name="studio_bundled_fonts">الخطوط (%1$d مثبّت من %2$d)</string>
     <string name="studio_time_size">حجم الوقت: %1$d sp</string>
     <string name="studio_date_size">حجم التاريخ: %1$d sp</string>
     <string name="studio_letter_spacing">تباعد الحروف</string>
@@ -399,4 +399,5 @@
     <string name="chess_explain_simple_delay">تتوقّف ساعتك طوال مدة التأخير ثم تبدأ بالعد.</string>
     <string name="chess_explain_bronstein">تعدّ ساعتك فوراً، ثم يُعاد إليك ما استهلكتَه بحدّ أقصى مدة التأخير.</string>
     <string name="cancel">إلغاء</string>
+    <string name="studio_font_substituted">غير مثبّت — يُعرض بخط بديل</string>
 </resources>

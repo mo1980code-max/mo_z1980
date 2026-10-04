@@ -52,6 +52,7 @@ import com.digitalclockpro.domain.model.WidgetConfig
 import com.digitalclockpro.domain.model.WidgetLayout
 import com.digitalclockpro.presentation.common.rememberCurrentTime
 import com.digitalclockpro.widget.FontCatalog
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.digitalclockpro.R
 import androidx.annotation.StringRes
@@ -339,13 +340,30 @@ private fun analogFaceLabel(face: AnalogFace): Int = when (face) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FontTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
-    Text(stringResource(R.string.studio_bundled_fonts, FontCatalog.fonts.size), style = MaterialTheme.typography.titleSmall)
+    val context = LocalContext.current
+    // Counted once per composition, not per chip: getIdentifier is a resource-table lookup.
+    val installed = remember(context) { FontCatalog.installedCount(context) }
+    Text(
+        stringResource(R.string.studio_bundled_fonts, installed, FontCatalog.fonts.size),
+        style = MaterialTheme.typography.titleSmall
+    )
+    // Every face the app is designed around is listed, but the ones with no .ttf in res/font
+    // are drawn in a substitute system family. Saying so beats letting the user pick
+    // "Orbitron" and wonder why it looks like Roboto.
+    if (installed < FontCatalog.fonts.size) {
+        Text(
+            stringResource(R.string.studio_font_substituted),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FontCatalog.fonts.forEach { font ->
+            val real = FontCatalog.isInstalled(context, font)
             FilterChip(
                 selected = config.fontKey == font.key && config.customFontUri == null,
                 onClick = { vm.update { it.copy(fontKey = font.key, customFontUri = null) } },
-                label = { Text(font.displayName) }
+                label = { Text(if (real) font.displayName else "${font.displayName} *") }
             )
         }
     }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Themed-icon (Android 13+) layer. The system tints this single-colour silhouette with the
+  wallpaper palette, so gradients and multiple colours are meaningless here — reusing the
+  colour foreground would have produced a flat, muddy blob. Weights are nudged up slightly
+  because a tinted silhouette loses the contrast the coloured version got for free.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M54,31L54,21M77,54L87,54M54,77L54,87M31,54L21,54"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M68,29.75L70.5,25.42M78.25,40L82.58,37.5M78.25,68L82.58,70.5M68,78.25L70.5,82.58M40,78.25L37.5,82.58M29.75,68L25.42,70.5M29.75,40L25.42,37.5M40,29.75L37.5,25.42"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="3.4" />
+    <path
+        android:pathData="M54,54L40.58,46.25"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="6.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M54,54L73.05,43"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round" />
+</vector>

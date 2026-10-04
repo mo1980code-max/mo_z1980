@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.digitalclockpro.R
 import com.digitalclockpro.clockengine.ClockEngine
 import com.digitalclockpro.core.ui.theme.DigitalClockProTheme
@@ -121,8 +123,10 @@ class FullScreenClockActivity : ComponentActivity() {
 @Composable
 private fun DeskClockScreen(
     onBrightnessChange: (Float) -> Unit,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    viewModel: DeskClockViewModel = hiltViewModel()
 ) {
+    val preferences by viewModel.preferences.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val density = LocalDensity.current
 
@@ -202,7 +206,14 @@ private fun DeskClockScreen(
                 )
             } else {
                 Text(
-                    text = TimeFormatters.formatTime(now, use24h = false, showSeconds = true),
+                    // Obeys the app-wide 12/24h setting. Seconds stay on unconditionally: a desk
+                    // clock you stare at from across the room is exactly where a ticking
+                    // seconds field earns its place, whatever the in-app preference says.
+                    text = TimeFormatters.formatTime(
+                        now,
+                        use24h = preferences.use24Hour,
+                        showSeconds = true
+                    ),
                     fontSize = 86.sp,
                     fontFamily = FontFamily.Monospace,
                     color = Color(0xFF00E5FF)
