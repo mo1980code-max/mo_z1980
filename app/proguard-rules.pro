@@ -1,0 +1,8 @@
+-keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod
+-keep class com.digitalclockpro.widget.** { *; }
+-keep class com.digitalclockpro.alarm.** { *; }
+-keepclassmembers class * extends android.appwidget.AppWidgetProvider { *; }
+-keepclassmembers class * extends android.content.BroadcastReceiver { *; }
+-keepnames class kotlinx.serialization.** { *; }
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1> { static <1>$Companion Companion; *** serializer(...); }
