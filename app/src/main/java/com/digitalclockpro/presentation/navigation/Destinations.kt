@@ -20,6 +20,7 @@ enum class TopLevelDestination(val route: String, val label: String, val icon: I
 }
 
 object Routes {
+    const val OEM_SETUP = "oem_setup"
     const val ALARM_EDIT = "alarm_edit"
     const val ALARM_EDIT_ARG = "alarmId"
     fun alarmEdit(alarmId: Long = 0L) = "$ALARM_EDIT/$alarmId"

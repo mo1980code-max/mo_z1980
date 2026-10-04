@@ -1,8 +1,11 @@
 package com.digitalclockpro.presentation.alarms
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.digitalclockpro.data.ringtone.AlarmSound
+import com.digitalclockpro.data.ringtone.RingtoneRepository
 import com.digitalclockpro.domain.model.Alarm
 import com.digitalclockpro.domain.model.DismissChallenge
 import com.digitalclockpro.domain.model.VibrationPattern
@@ -26,6 +29,7 @@ class AlarmEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val alarmRepository: AlarmRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val ringtoneRepository: RingtoneRepository,
     private val saveAlarm: SaveAlarmUseCase
 ) : ViewModel() {
 
@@ -36,7 +40,11 @@ class AlarmEditViewModel @Inject constructor(
     )
     val alarm: StateFlow<Alarm> = _alarm.asStateFlow()
 
+    private val _sounds = MutableStateFlow(SoundPickerState())
+    val sounds: StateFlow<SoundPickerState> = _sounds.asStateFlow()
+
     init {
+        refreshSounds()
         viewModelScope.launch {
             if (alarmId > 0L) {
                 alarmRepository.getAlarm(alarmId)?.let { _alarm.value = it }
@@ -62,8 +70,73 @@ class AlarmEditViewModel @Inject constructor(
     fun setSnooze(minutes: Int) = _alarm.update { it.copy(snoozeMinutes = minutes.coerceIn(1, 30)) }
     fun setMaxSnooze(count: Int) = _alarm.update { it.copy(maxSnoozeCount = count.coerceIn(0, 10)) }
     fun setVibration(pattern: VibrationPattern) = _alarm.update { it.copy(vibrationPattern = pattern) }
-    fun setSound(uri: String?, title: String) = _alarm.update { it.copy(soundUri = uri, soundTitle = title) }
+    fun setSound(uri: String?, title: String) {
+        _alarm.update { it.copy(soundUri = uri, soundTitle = title) }
+        viewModelScope.launch { verifyCurrentSound() }
+    }
+
+    fun selectSound(sound: AlarmSound) = setSound(sound.uri, sound.title)
+
+    /**
+     * Imports a user-picked audio file by **copying it into app storage**, so the alarm keeps
+     * working after the Uri permission is revoked or the original file is moved/deleted.
+     */
+    fun importRingtone(uri: Uri) = viewModelScope.launch {
+        _sounds.update { it.copy(importing = true, importError = null) }
+        val imported = ringtoneRepository.importFromUri(uri)
+        if (imported == null) {
+            _sounds.update {
+                it.copy(
+                    importing = false,
+                    importError = "Could not import this file. Pick an audio file " +
+                        "(mp3, wav, ogg, m4a, flac) smaller than 25 MB."
+                )
+            }
+            return@launch
+        }
+        setSound(imported.uri, imported.title)
+        _sounds.update { it.copy(importing = false, importError = null) }
+        refreshSounds()
+    }
+
+    fun deleteImported(sound: AlarmSound) = viewModelScope.launch {
+        val uri = sound.uri ?: return@launch
+        if (ringtoneRepository.deleteImported(uri)) {
+            if (_alarm.value.soundUri == uri) {
+                val fallback = ringtoneRepository.defaultAlarmSound()
+                setSound(fallback.uri, fallback.title)
+            }
+            refreshSounds()
+        }
+    }
+
+    fun dismissImportError() = _sounds.update { it.copy(importError = null) }
+
+    private fun refreshSounds() = viewModelScope.launch {
+        _sounds.update {
+            it.copy(
+                system = listOf(ringtoneRepository.defaultAlarmSound()) +
+                    ringtoneRepository.systemAlarmSounds(),
+                imported = ringtoneRepository.importedSounds()
+            )
+        }
+        verifyCurrentSound()
+    }
+
+    /** Flags a sound whose file disappeared so the user can pick another one before it fails. */
+    private suspend fun verifyCurrentSound() {
+        val playable = ringtoneRepository.isPlayable(_alarm.value.soundUri)
+        _sounds.update { it.copy(currentSoundMissing = !playable) }
+    }
     fun setChallenge(challenge: DismissChallenge) = _alarm.update { it.copy(challenge = challenge) }
+
+    data class SoundPickerState(
+        val system: List<AlarmSound> = emptyList(),
+        val imported: List<AlarmSound> = emptyList(),
+        val importing: Boolean = false,
+        val importError: String? = null,
+        val currentSoundMissing: Boolean = false
+    )
 
     fun save(onDone: () -> Unit) = viewModelScope.launch {
         saveAlarm(_alarm.value.copy(enabled = true, currentSnoozeCount = 0))

@@ -35,6 +35,31 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.APP_CALCULATOR" />
         </intent>
+        <!-- Audio picker for custom alarm ringtones -->
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+            <data android:mimeType="audio/*" />
+        </intent>
+
+        <!--
+          OEM power-manager / autostart screens (OemPowerSettings).
+          Android 11+ package visibility hides these unless they are declared here, which would
+          make every vendor deep link look "unavailable".
+        -->
+        <package android:name="com.miui.securitycenter" />       <!-- Xiaomi MIUI / HyperOS -->
+        <package android:name="com.miui.powerkeeper" />
+        <package android:name="com.huawei.systemmanager" />      <!-- Huawei EMUI / Honor -->
+        <package android:name="com.samsung.android.lool" />      <!-- Samsung One UI -->
+        <package android:name="com.samsung.android.sm" />
+        <package android:name="com.coloros.safecenter" />        <!-- OPPO / realme ColorOS -->
+        <package android:name="com.coloros.oppoguardelf" />
+        <package android:name="com.oppo.safe" />
+        <package android:name="com.oneplus.security" />          <!-- OnePlus OxygenOS -->
+        <package android:name="com.vivo.permissionmanager" />    <!-- vivo / iQOO -->
+        <package android:name="com.iqoo.secure" />
+        <package android:name="com.vivo.pem" />
+        <package android:name="com.asus.mobilemanager" />        <!-- ASUS ZenUI -->
+        <package android:name="com.letv.android.letvsafe" />     <!-- LeEco EUI -->
     </queries>
 
     <application

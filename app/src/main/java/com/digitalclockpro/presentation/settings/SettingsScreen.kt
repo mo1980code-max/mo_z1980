@@ -1,5 +1,6 @@
 package com.digitalclockpro.presentation.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BatteryAlert
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -21,11 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.digitalclockpro.core.util.OemPowerSettings
 import com.digitalclockpro.domain.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onOpenOemGuide: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
 
     Column(
@@ -54,6 +63,25 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
         SwitchRow("Weather on widgets", prefs.weatherEnabled, viewModel::setWeatherEnabled)
         SwitchRow("Use °C", prefs.weatherCelsius, viewModel::setCelsius)
         SwitchRow("Keep screen on (dashboard)", prefs.keepScreenOnDashboard, viewModel::setKeepScreenOn)
+
+        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+        Text(
+            "Reliability",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        ListItem(
+            headlineContent = { Text("Make alarms reliable on ${OemPowerSettings.vendor.displayName}") },
+            supportingContent = {
+                Text(
+                    if (OemPowerSettings.requiresManualWhitelisting)
+                        "${OemPowerSettings.romName} can kill background alarms — action needed"
+                    else "Battery optimization and autostart settings"
+                )
+            },
+            leadingContent = { Icon(Icons.Filled.BatteryAlert, contentDescription = null) },
+            modifier = Modifier.clickable(onClick = onOpenOemGuide)
+        )
     }
 }
 

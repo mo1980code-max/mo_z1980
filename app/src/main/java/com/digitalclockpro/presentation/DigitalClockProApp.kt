@@ -21,6 +21,7 @@ import com.digitalclockpro.presentation.dashboard.DashboardScreen
 import com.digitalclockpro.presentation.navigation.Routes
 import com.digitalclockpro.presentation.navigation.TopLevelDestination
 import com.digitalclockpro.presentation.settings.SettingsScreen
+import com.digitalclockpro.presentation.settings.oem.OemSetupScreen
 import com.digitalclockpro.presentation.world.WorldClockScreen
 
 @Composable
@@ -69,7 +70,12 @@ fun DigitalClockProApp(startDestination: TopLevelDestination) {
                     onEditAlarm = { id -> navController.navigate(Routes.alarmEdit(id)) }
                 )
             }
-            composable(TopLevelDestination.SETTINGS.route) { SettingsScreen() }
+            composable(TopLevelDestination.SETTINGS.route) {
+                SettingsScreen(
+                    onOpenOemGuide = { navController.navigate(Routes.OEM_SETUP) }
+                )
+            }
+            composable(Routes.OEM_SETUP) { OemSetupScreen() }
             composable(
                 route = "${Routes.ALARM_EDIT}/{${Routes.ALARM_EDIT_ARG}}",
                 arguments = listOf(navArgument(Routes.ALARM_EDIT_ARG) { type = NavType.LongType })

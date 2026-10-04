@@ -135,13 +135,34 @@ BootReceiver: BOOT_COMPLETED | LOCKED_BOOT_COMPLETED | MY_PACKAGE_REPLACED | TIM
 * DST & timezone changes → next trigger always recomputed from `LocalDateTime` + `ZoneId`.
 * Snooze budget (`maxSnoozeCount`) enforced in `SnoozeAlarmUseCase`.
 
-## 5. Permissions
+## 5. Reliability on OEM ROMs & custom alarm sounds
+
+**OEM autostart / power guide** (`core/util/OemPowerSettings.kt`, `presentation/settings/oem/`)
+Detects the vendor from `Build.MANUFACTURER`/`BRAND` (Xiaomi-MIUI/HyperOS, Huawei-EMUI, Samsung
+One UI, OPPO-ColorOS, OnePlus, vivo, ASUS, LeEco) and renders a checklist with direct deep links
+into each vendor screen (Autostart, Battery saver "No restrictions", Protected apps, Sleeping
+apps…). Component names change between ROM versions, so each step probes several historical
+candidates with `queryIntentActivities` and only shows a button when one resolves — otherwise the
+written instructions remain. Progress is ticked off and stored in DataStore. The matching
+`<package>` entries are declared in `<queries>`, without which Android 11+ visibility rules would
+hide every vendor Activity.
+
+**Custom ringtones** (`data/ringtone/RingtoneRepository.kt`)
+`ActivityResultContracts.OpenDocument()` picks an audio file; the repository **copies it into
+`filesDir/ringtones/`** (same approach as imported fonts) and the alarm stores a stable `file://`
+Uri. This survives revoked Uri grants, moved/deleted originals, unmounted SD cards and Direct
+Boot, where a credential-protected provider cannot be resolved at all. Imports are validated by
+MIME/extension (mp3, wav, ogg, m4a, aac, flac, opus) and capped at 25 MB; file names are
+sanitised and de-duplicated. `isPlayable()` warns in the editor when a previously chosen sound
+has disappeared.
+
+## 6. Permissions
 
 `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, `POST_NOTIFICATIONS`, `USE_FULL_SCREEN_INTENT`,
 `RECEIVE_BOOT_COMPLETED`, `VIBRATE`, `WAKE_LOCK`, `FOREGROUND_SERVICE`,
 `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, `FOREGROUND_SERVICE_SPECIAL_USE`, `INTERNET` (weather, optional).
 
-## 6. Build & run
+## 7. Build & run
 
 ```bash
 # Android Studio Ladybug+ : File ▸ Open ▸ this folder, then Run ▸ app
