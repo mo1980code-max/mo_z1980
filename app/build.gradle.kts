@@ -38,7 +38,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions {
+        jvmTarget = "17"
+        // Opted in module-wide rather than annotating each composable. PrimaryTabRow,
+        // SegmentedButton and FlowRow are all still experimental in Compose BOM 2024.09.03,
+        // and @ExperimentalMaterial3Api is an ERROR-level opt-in, so a missing annotation
+        // fails the build outright. One declaration here beats chasing them file by file.
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi"
+        )
+    }
 
     buildFeatures {
         compose = true

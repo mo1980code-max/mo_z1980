@@ -15,7 +15,13 @@ java {
 }
 
 kotlin {
-    jvmToolchain(17)
+    // Deliberately NOT jvmToolchain(17). settings.gradle.kts has no foojay toolchain
+    // resolver, so if Gradle runs on anything other than a JDK 17 it fails with
+    // "No matching toolchains found" before compiling a line. Pinning jvmTarget instead
+    // emits 17 bytecode from whichever JDK Studio happens to launch Gradle with.
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
 
 dependencies {
