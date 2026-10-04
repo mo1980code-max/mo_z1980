@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 4x1 dual-zone clock. updatePeriodMillis=0: refreshed by WidgetTickController only. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="40dp"
+    android:minResizeWidth="180dp"
+    android:minResizeHeight="40dp"
+    android:maxResizeWidth="420dp"
+    android:maxResizeHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="1"
+    android:resizeMode="horizontal"
+    android:widgetCategory="home_screen|keyguard"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_dual_clock"
+    android:previewLayout="@layout/widget_dual_clock"
+    android:configure="com.digitalclockpro.presentation.studio.WidgetConfigActivity"
+    android:description="@string/widget_dual_description" />

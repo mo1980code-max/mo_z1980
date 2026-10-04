@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ===== MODULE C : Alarm engine permissions ===== -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!--
+      Used only by an explicit user tap in the reliability banner / OEM guide
+      (Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS). Play policy exception:
+      IMPORTANT_BACKGROUND_FUNCTION - an alarm clock must ring at an exact time while the
+      device is idle. The app is fully functional without it.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!--
+      Optional weather only. Custom ringtones and fonts are picked through the Storage Access
+      Framework (ACTION_OPEN_DOCUMENT), which grants per-file access, so neither
+      READ_EXTERNAL_STORAGE nor READ_MEDIA_AUDIO is required.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.APP_CALENDAR" />
+        </intent>
+        <!-- Probed by WidgetTapActions for the "tap weather" action -->
+        <package android:name="com.google.android.apps.weather" />
+        <package android:name="com.weather.Weather" />
+        <package android:name="com.samsung.android.weather" />
+
+        <!-- Audio picker for custom alarm ringtones -->
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+            <data android:mimeType="audio/*" />
+        </intent>
+
+        <!--
+          OEM power-manager / autostart screens (OemPowerSettings).
+          Android 11+ package visibility hides these unless they are declared here, which would
+          make every vendor deep link look "unavailable".
+        -->
+        <package android:name="com.miui.securitycenter" />       <!-- Xiaomi MIUI / HyperOS -->
+        <package android:name="com.miui.powerkeeper" />
+        <package android:name="com.huawei.systemmanager" />      <!-- Huawei EMUI / Honor -->
+        <package android:name="com.samsung.android.lool" />      <!-- Samsung One UI -->
+        <package android:name="com.samsung.android.sm" />
+        <package android:name="com.coloros.safecenter" />        <!-- OPPO / realme ColorOS -->
+        <package android:name="com.coloros.oppoguardelf" />
+        <package android:name="com.oppo.safe" />
+        <package android:name="com.oneplus.security" />          <!-- OnePlus OxygenOS -->
+        <package android:name="com.vivo.permissionmanager" />    <!-- vivo / iQOO -->
+        <package android:name="com.iqoo.secure" />
+        <package android:name="com.vivo.pem" />
+        <package android:name="com.asus.mobilemanager" />        <!-- ASUS ZenUI -->
+        <package android:name="com.letv.android.letvsafe" />     <!-- LeEco EUI -->
+    </queries>
+
+    <application
+        android:name=".DigitalClockApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
+        android:theme="@style/Theme.DigitalClockPro"
+        tools:targetApi="35">
+
+        <!-- ===== Presentation ===== -->
+        <activity
+            android:name=".presentation.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.DigitalClockPro">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- System "set alarm" integrations / Assistant -->
+            <intent-filter>
+                <action android:name="android.intent.action.SET_ALARM" />
+                <action android:name="android.intent.action.SHOW_ALARMS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Full-screen ringing activity: shows over lockscreen -->
+        <activity
+            android:name=".presentation.ringing.AlarmRingingActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:showWhenLocked="true"
+            android:taskAffinity=".alarmringing"
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:theme="@style/Theme.DigitalClockPro.Ringing" />
+
+        <!-- Widget configuration activity (Widget Customizer Studio) -->
+        <activity
+            android:name=".presentation.studio.WidgetConfigActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.DigitalClockPro">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- ===== MODULE C : Alarm engine components ===== -->
+        <activity
+            android:name=".presentation.deskclock.FullScreenClockActivity"
+            android:exported="false"
+            android:label="@string/desk_clock"
+            android:screenOrientation="fullUser"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.DigitalClockPro" />
+
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="com.digitalclockpro.action.ALARM_FIRE" />
+                <action android:name="com.digitalclockpro.action.ALARM_SNOOZE" />
+                <action android:name="com.digitalclockpro.action.ALARM_DISMISS" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".alarm.BootReceiver"
+            android:exported="true"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".alarm.AlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback|specialUse"
+            android:stopWithTask="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps the alarm ringing reliably until the user dismisses it." />
+        </service>
+
+        <!-- ===== MODULE A : Widgets ===== -->
+        <receiver
+            android:name=".widget.ClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_clock_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.AnalogClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_analog_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_analog_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.AnalogClockWidgetLargeProvider"
+            android:exported="true"
+            android:label="@string/widget_analog_large_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_analog_large_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.WorldClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_world_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_world_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.DualClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_dual_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.digitalclockpro.action.WIDGET_REFRESH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_dual_info" />
+        </receiver>
+
+        <!-- Glance-powered Material You widget -->
+        <receiver
+            android:name=".widget.glance.GlanceClockWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_glance_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_glance_info" />
+        </receiver>
+
+        <!-- Ticks the widgets 1x/minute while the screen is ON only (battery safe) -->
+        <receiver
+            android:name=".widget.WidgetTickReceiver"
+            android:exported="false" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+    </application>
+</manifest>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Analog clock widget: default 3x3, resizable up to 4x4 and beyond.
+  updatePeriodMillis = 0 -> the system never wakes the device for us; redraws come from
+  ACTION_TIME_TICK while the screen is on (WidgetTickController), so the dial costs no battery.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="180dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="110dp"
+    android:maxResizeWidth="320dp"
+    android:maxResizeHeight="320dp"
+    android:targetCellWidth="3"
+    android:targetCellHeight="3"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen|keyguard"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_analog_clock"
+    android:initialKeyguardLayout="@layout/widget_analog_clock"
+    android:previewLayout="@layout/widget_analog_clock"
+    android:configure="com.digitalclockpro.presentation.studio.WidgetConfigActivity"
+    android:description="@string/widget_analog_description" />

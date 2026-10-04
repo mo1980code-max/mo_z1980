@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Default placement 4x2, resizable 2x1 .. 5x3.
+  updatePeriodMillis = 0  ->  the system NEVER wakes the device for us; all refreshes come from
+  ACTION_TIME_TICK while the screen is on (see WidgetTickController) => no battery drain.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="40dp"
+    android:maxResizeWidth="420dp"
+    android:maxResizeHeight="220dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen|keyguard"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_clock"
+    android:initialKeyguardLayout="@layout/widget_clock"
+    android:previewLayout="@layout/widget_clock"
+    android:configure="com.digitalclockpro.presentation.studio.WidgetConfigActivity"
+    android:description="@string/widget_clock_description" />

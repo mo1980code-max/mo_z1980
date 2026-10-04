@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="database" path="digital_clock_pro.db" />
+    <include domain="file" path="datastore/" />
+    <include domain="file" path="fonts/" />
+</full-backup-content>

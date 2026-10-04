@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.DigitalClockPro" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/background_light</item>
+    </style>
+
+    <!-- High-contrast dark theme so the ringing screen never blinds a half-asleep user. -->
+    <style name="Theme.DigitalClockPro.Ringing" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/amoled_black</item>
+        <item name="android:statusBarColor">@color/amoled_black</item>
+        <item name="android:navigationBarColor">@color/amoled_black</item>
+        <item name="android:windowShowWallpaper">false</item>
+    </style>
+
+    <style name="Theme.DigitalClockPro.Widget" parent="">
+        <item name="android:colorBackground">@android:color/transparent</item>
+    </style>
+</resources>

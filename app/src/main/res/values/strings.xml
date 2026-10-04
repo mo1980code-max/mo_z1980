@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Digital Clock Pro</string>
+
+    <!-- ============================== Common ============================== -->
+    <string name="ok">OK</string>
+    <string name="grant">Grant</string>
+    <string name="later">Later</string>
+    <string name="allow">Allow</string>
+    <string name="remove">Remove</string>
+    <string name="reset">Reset</string>
+    <string name="granted">Granted</string>
+    <string name="bullet_separator" translatable="false">" • "</string>
+
+    <!-- ============================== Navigation ============================== -->
+    <string name="nav_clock">Clock</string>
+    <string name="nav_world">World</string>
+    <string name="nav_alarms">Alarms</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- ============================== Dashboard ============================== -->
+    <string name="dashboard_date_pattern" translatable="false">EEEE, MMMM d</string>
+    <string name="dashboard_no_upcoming_alarm">No upcoming alarm</string>
+    <string name="dashboard_tap_to_create">Tap to create one</string>
+    <string name="dashboard_alarms_count">Alarms (%1$d)</string>
+    <string name="dashboard_world">World</string>
+    <string name="dashboard_widget_hint">Long-press your home screen → Widgets → Digital Clock Pro to add a widget, then open the Widget Studio to style it.</string>
+
+    <!-- ============================== Alarm list ============================== -->
+    <string name="alarm">Alarm</string>
+    <string name="alarms">Alarms</string>
+    <string name="add_alarm">Add alarm</string>
+    <string name="next_alarm">Next alarm</string>
+    <string name="no_alarms">No alarms yet</string>
+    <string name="no_alarms_hint">Tap + to create your first alarm.</string>
+    <string name="delete_alarm">Delete alarm</string>
+    <string name="repeat_once">Once</string>
+    <string name="repeat_every_day">Every day</string>
+    <string name="repeat_weekdays">Weekdays</string>
+    <string name="repeat_weekends">Weekends</string>
+    <string name="challenge_math_short">Math ×%1$d</string>
+    <string name="challenge_shake_short">Shake ×%1$d</string>
+    <string name="challenge_memory_short">Memory</string>
+
+    <!-- ============================== Alarm editor ============================== -->
+    <string name="alarm_label">Label</string>
+    <string name="alarm_repeat">Repeat</string>
+    <string name="alarm_volume">Volume %1$d%%</string>
+    <string name="alarm_volume_ramp">Volume ramp: %1$ds</string>
+    <string name="alarm_snooze_summary">Snooze: %1$d min, max %2$d×</string>
+    <string name="alarm_vibration">Vibration</string>
+    <string name="alarm_dismiss_challenge">Dismiss challenge</string>
+    <string name="challenge_none">None</string>
+    <string name="challenge_math">Math</string>
+    <string name="challenge_shake">Shake</string>
+    <string name="challenge_memory">Memory</string>
+    <string name="challenge_problems">Problems: %1$d • %2$s</string>
+    <string name="challenge_shakes_required">Shakes required: %1$d</string>
+    <string name="difficulty_easy">easy</string>
+    <string name="difficulty_medium">medium</string>
+    <string name="difficulty_hard">hard</string>
+    <string name="save_alarm">Save alarm</string>
+
+    <!-- ============================== Ringtone picker ============================== -->
+    <string name="alarm_sound">Alarm sound</string>
+    <string name="sound_silent">Silent</string>
+    <string name="sound_default">Default alarm sound</string>
+    <string name="sound_bundled_fallback">Built-in beep (works before unlock)</string>
+    <string name="sound_imported_header">Imported</string>
+    <string name="sound_device_header">Device ringtones</string>
+    <string name="sound_pick_from_device">Pick from device</string>
+    <string name="sound_delete_imported">Delete imported sound</string>
+    <string name="sound_missing_warning">This sound is no longer available — pick another one or the default alarm tone will be used.</string>
+    <string name="sound_import_failed">Could not import this file. Pick an audio file (mp3, wav, ogg, m4a, flac) smaller than 25 MB.</string>
+    <string name="sound_preview">Preview sound</string>
+    <string name="sound_preview_stop">Stop preview</string>
+    <string name="sound_preview_blocked_ringing">Can\'t preview while an alarm is ringing.</string>
+    <string name="sound_preview_failed">This sound could not be played.</string>
+
+    <!-- ============================== Ringing screen ============================== -->
+    <string name="snooze">Snooze</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="snooze_minutes_left">Snooze %1$d min (%2$d left)</string>
+    <string name="no_snoozes_left">No snoozes left</string>
+    <string name="snoozes_left">%1$d snoozes left</string>
+    <string name="slide_to_dismiss">Slide to dismiss  →</string>
+    <string name="solve_to_dismiss">Solve to dismiss</string>
+    <string name="ringing_problem_index">Problem %1$d of %2$d</string>
+    <string name="ringing_check">Check</string>
+    <string name="shake_to_dismiss">Shake your phone</string>
+    <string name="ringing_shake_progress">%1$d / %2$d</string>
+    <string name="tap_in_order">Tap the numbers in order</string>
+
+    <!-- ============================== World clock ============================== -->
+    <string name="world_clock">WORLD CLOCK</string>
+    <string name="add_city">Add city</string>
+    <string name="search_cities">Search for a city or time zone…</string>
+    <string name="time_travel">Time travel</string>
+    <string name="reset_to_now">Now</string>
+    <string name="world_now_plus_offset">now + offset</string>
+    <string name="world_city_subtitle">%1$s • %2$s</string>
+    <string name="world_offset_hours">%1$dh</string>
+    <string name="world_offset_minutes">%1$dm</string>
+    <string name="world_daytime">Daytime</string>
+    <string name="world_night">Night</string>
+
+    <!-- ============================== Settings ============================== -->
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_dynamic_color">Material You dynamic color</string>
+    <string name="settings_amoled">AMOLED pure black</string>
+    <string name="settings_24h">24-hour format</string>
+    <string name="settings_show_seconds">Show seconds in app</string>
+    <string name="settings_weather">Weather on widgets</string>
+    <string name="settings_celsius">Use °C</string>
+    <string name="settings_keep_screen_on">Keep screen on (dashboard)</string>
+    <string name="settings_reliability">Reliability</string>
+    <string name="settings_oem_warning">%1$s can kill background alarms — action needed</string>
+    <string name="settings_oem_subtitle">Battery optimization and autostart settings</string>
+
+    <!-- ============================== Reliability banner ============================== -->
+    <string name="reliability_broken_title">Your alarms may not ring</string>
+    <string name="reliability_improve_title">Make alarms more reliable</string>
+    <string name="reliability_battery_optional">Optional: exempting the app from battery optimization makes alarms more reliable on aggressive power-saving devices.</string>
+    <string name="reliability_allow_notifications">Allow notifications</string>
+    <string name="reliability_allow_exact_alarms">Allow exact alarms</string>
+    <string name="reliability_allow_fullscreen">Allow full-screen alarms</string>
+    <string name="reliability_ignore_battery">Ignore battery optimizations (optional)</string>
+    <string name="reliability_issue_notifications">notifications are blocked</string>
+    <string name="reliability_issue_exact_alarms">exact alarms are not allowed</string>
+    <string name="reliability_issue_fullscreen">full-screen alarms are blocked</string>
+    <string name="reliability_all_good">Alarms are set up correctly</string>
+    <string name="reliability_list_separator" translatable="false">", "</string>
+    <string name="reliability_sentence_end" translatable="false">.</string>
+
+    <!-- ============================== OEM setup guide ============================== -->
+    <string name="oem_title">Make alarms reliable on %1$s</string>
+    <string name="oem_device_line">%1$s (%2$s)</string>
+    <string name="oem_intro_restricted">This ROM runs its own app killer on top of Android. Until the steps below are done, your alarms can be cancelled while the screen is off — even with exact alarms granted.</string>
+    <string name="oem_intro_clean">No vendor-specific restrictions detected. The optional steps below can still make alarms more resilient.</string>
+    <string name="oem_version_warning">These screens are provided by your phone manufacturer and move between ROM versions. If a button does not open the right page, search your system Settings for the setting name shown in each step. Alarms still work without these tweaks on stock Android.</string>
+    <string name="oem_battery_row">Android battery optimization (optional)</string>
+    <string name="oem_open_settings">Open settings</string>
+    <string name="oem_unavailable">This screen is not available on your ROM version — follow the steps manually.</string>
+    <string name="oem_test_tip">Tip: after finishing, set a test alarm 2 minutes ahead, lock the phone and put it aside. If it rings, your device is configured correctly.</string>
+
+    <!-- Vendors (brand names are proper nouns and stay as-is) -->
+    <string name="vendor_xiaomi" translatable="false">Xiaomi / Redmi / POCO</string>
+    <string name="vendor_huawei" translatable="false">Huawei / Honor</string>
+    <string name="vendor_samsung" translatable="false">Samsung</string>
+    <string name="vendor_oppo" translatable="false">OPPO / realme</string>
+    <string name="vendor_oneplus" translatable="false">OnePlus</string>
+    <string name="vendor_vivo" translatable="false">vivo / iQOO</string>
+    <string name="vendor_asus" translatable="false">ASUS</string>
+    <string name="vendor_nokia" translatable="false">Nokia / HMD</string>
+    <string name="vendor_letv" translatable="false">LeEco</string>
+    <string name="vendor_other">Your device</string>
+
+    <!-- OEM steps -->
+    <string name="oem_miui_autostart_title">Enable Autostart</string>
+    <string name="oem_miui_autostart_desc">MIUI blocks the alarm from restarting after the phone reboots or the app is swiped away.</string>
+    <string name="oem_miui_autostart_steps">Security → Permissions → Autostart → turn ON “Digital Clock Pro”.</string>
+    <string name="oem_miui_battery_title">Set battery saver to “No restrictions”</string>
+    <string name="oem_miui_battery_desc">MIUI’s own power keeper is separate from Android’s battery optimization.</string>
+    <string name="oem_miui_battery_steps">Find “Digital Clock Pro” → Battery saver → choose “No restrictions”.</string>
+    <string name="oem_miui_lock_title">Lock the app in Recents</string>
+    <string name="oem_miui_lock_desc">Prevents “clear all” from killing the ringing alarm.</string>
+    <string name="oem_miui_lock_steps">Open Recents → swipe down on Digital Clock Pro → tap the padlock icon.</string>
+
+    <string name="oem_huawei_startup_title">Manage app launch manually</string>
+    <string name="oem_huawei_startup_desc">EMUI closes apps it manages automatically.</string>
+    <string name="oem_huawei_startup_steps">App launch → turn OFF “Manage automatically” for Digital Clock Pro → enable all three switches (Auto-launch, Secondary launch, Run in background).</string>
+    <string name="oem_huawei_protected_title">Add to protected apps</string>
+    <string name="oem_huawei_protected_desc">Keeps the alarm service alive when the screen is off.</string>
+    <string name="oem_huawei_protected_steps">Protected apps → enable Digital Clock Pro.</string>
+
+    <string name="oem_samsung_sleeping_title">Remove from “Sleeping apps”</string>
+    <string name="oem_samsung_sleeping_desc">One UI puts rarely used apps to sleep, which cancels their alarms.</string>
+    <string name="oem_samsung_sleeping_steps">Battery → Background usage limits → make sure Digital Clock Pro is NOT in “Sleeping” or “Deep sleeping” apps.</string>
+    <string name="oem_samsung_care_title">Turn off “Put unused apps to sleep”</string>
+    <string name="oem_samsung_care_desc">Device Care re-sleeps apps automatically every few days.</string>
+    <string name="oem_samsung_care_steps">Device care → Battery → Background usage limits → turn OFF “Put unused apps to sleep”.</string>
+
+    <string name="oem_oppo_startup_title">Allow auto-startup</string>
+    <string name="oem_oppo_startup_desc">ColorOS blocks background start after reboot.</string>
+    <string name="oem_oppo_startup_steps">Startup manager → enable Digital Clock Pro.</string>
+    <string name="oem_oppo_power_title">Disable battery restrictions</string>
+    <string name="oem_oppo_power_desc">Set the app to “Allow background running”.</string>
+    <string name="oem_oppo_power_steps">Power saver → App battery management → Digital Clock Pro → allow background running + auto-launch.</string>
+
+    <string name="oem_oneplus_chain_title">Allow auto-launch</string>
+    <string name="oem_oneplus_chain_desc">OxygenOS “Chain launch” control.</string>
+    <string name="oem_oneplus_chain_steps">Auto-launch → enable Digital Clock Pro.</string>
+    <string name="oem_oneplus_battery_title">Set battery to “Don’t optimize”</string>
+    <string name="oem_oneplus_battery_desc">Advanced optimization also needs to be off.</string>
+    <string name="oem_oneplus_battery_steps">Battery → Battery optimization → Digital Clock Pro → Don’t optimize.</string>
+
+    <string name="oem_vivo_bgstart_title">Allow background start-up</string>
+    <string name="oem_vivo_bgstart_desc">Funtouch OS blocks background launches by default.</string>
+    <string name="oem_vivo_bgstart_steps">Permission manager → Autostart → enable Digital Clock Pro.</string>
+    <string name="oem_vivo_whitelist_title">Add to high background power consumption list</string>
+    <string name="oem_vivo_whitelist_desc">Stops the system from freezing the alarm service.</string>
+    <string name="oem_vivo_whitelist_steps">Battery → High background power consumption → enable Digital Clock Pro.</string>
+
+    <string name="oem_asus_autostart_title">Enable Auto-start</string>
+    <string name="oem_asus_autostart_desc">ZenUI Mobile Manager auto-start list.</string>
+    <string name="oem_asus_autostart_steps">Mobile Manager → Auto-start manager → allow Digital Clock Pro.</string>
+
+    <string name="oem_letv_autoboot_title">Enable auto-boot</string>
+    <string name="oem_letv_autoboot_desc">EUI background app protection.</string>
+    <string name="oem_letv_autoboot_steps">Autoboot management → enable Digital Clock Pro.</string>
+
+    <string name="oem_aosp_battery_title">Android battery optimization</string>
+    <string name="oem_aosp_battery_desc">The standard exemption every Android version supports.</string>
+    <string name="oem_aosp_battery_steps">Choose “All apps” → Digital Clock Pro → Don’t optimize.</string>
+    <string name="oem_app_details_title">App info</string>
+    <string name="oem_app_details_desc">Manual access to notifications, alarms and battery settings.</string>
+    <string name="oem_app_details_steps">Use this if any button above does not open.</string>
+
+    <!-- ============================== Widget Studio ============================== -->
+    <string name="widget_studio">Widget Studio</string>
+    <string name="tab_presets">Presets</string>
+    <string name="tab_font">Font</string>
+    <string name="tab_colors">Colors</string>
+    <string name="tab_background">Background</string>
+    <string name="tab_layout">Layout</string>
+    <string name="tab_tap_actions">Tap actions</string>
+    <string name="save_widget">Save widget</string>
+    <string name="studio_bundled_fonts">Fonts (%1$d of %2$d installed)</string>
+    <string name="studio_time_size">Time size: %1$dsp</string>
+    <string name="studio_date_size">Date size: %1$dsp</string>
+    <string name="studio_letter_spacing">Letter spacing</string>
+    <string name="studio_time_color">Time color</string>
+    <string name="studio_date_color">Date color</string>
+    <string name="studio_accent_color">Accent color</string>
+    <string name="studio_gradient">Gradient</string>
+    <string name="studio_gradient_end">Gradient end</string>
+    <string name="studio_glow">Neon glow</string>
+    <string name="studio_glow_radius">Glow radius</string>
+    <string name="studio_shadow">Drop shadow</string>
+    <string name="studio_shadow_dx">Shadow dx</string>
+    <string name="studio_shadow_dy">Shadow dy</string>
+    <string name="studio_shadow_blur">Shadow blur</string>
+    <string name="studio_dynamic_color">Follow Material You colors</string>
+    <string name="studio_background">Background</string>
+    <string name="studio_opacity">Opacity: %1$d%%</string>
+    <string name="studio_corner_radius">Corner radius: %1$ddp</string>
+    <string name="studio_frosted">Frosted glass</string>
+    <string name="studio_border">Border</string>
+    <string name="studio_border_color">Border color</string>
+    <string name="studio_border_width">Border width</string>
+    <string name="studio_size">Size</string>
+    <string name="studio_24h">24-hour format</string>
+    <string name="studio_show_seconds">Show seconds</string>
+    <string name="studio_show_ampm">Show AM/PM</string>
+    <string name="studio_show_date">Show date</string>
+    <string name="studio_date_format">Date format</string>
+    <string name="studio_battery">Battery indicator</string>
+    <string name="studio_battery_bar">Show as bar</string>
+    <string name="studio_next_alarm">Next alarm</string>
+    <string name="studio_weather">Weather</string>
+    <string name="studio_celsius">Celsius</string>
+    <string name="studio_tap_hours">Tap hours</string>
+    <string name="studio_tap_minutes">Tap minutes</string>
+    <string name="studio_tap_date">Tap date</string>
+    <string name="studio_tap_weather">Tap weather</string>
+    <string name="studio_preview_battery" translatable="false">87%</string>
+    <string name="studio_preview_alarm" translatable="false">⏰ 7:00 AM</string>
+    <string name="studio_preview_weather_c" translatable="false">24°C Clear</string>
+    <string name="studio_preview_weather_f" translatable="false">75°F Clear</string>
+
+    <!-- ============================== Widgets ============================== -->
+    <string name="widget_clock_label">Digital Clock</string>
+    <string name="widget_world_label">World Clock</string>
+    <string name="widget_glance_label">Digital Clock (Material You)</string>
+    <string name="widget_clock_description">Fully customizable digital clock with date, battery, next alarm and weather.</string>
+    <string name="widget_world_description">Track up to four time zones at a glance.</string>
+    <string name="widget_glance_description">Material You digital clock that follows your wallpaper colors.</string>
+    <string name="widget_time_desc">Current time</string>
+    <string name="widget_info_desc">Date, battery and alarm information</string>
+
+    <!-- ============================== Notifications ============================== -->
+    <string name="channel_alarm_ringing">Ringing alarms</string>
+    <string name="channel_alarm_ringing_desc">Full-screen alerts while an alarm is ringing.</string>
+    <string name="channel_alarm_upcoming">Upcoming alarms</string>
+    <string name="channel_alarm_upcoming_desc">Silent reminder of your next alarm.</string>
+
+    <!-- ============================== Legacy permission copy ============================== -->
+    <string name="perm_exact_alarm_title">Allow exact alarms</string>
+    <string name="perm_exact_alarm_body">Android needs permission to ring your alarms at the exact second, even in Doze mode.</string>
+    <string name="perm_notifications_title">Allow notifications</string>
+    <string name="perm_notifications_body">Required to show the full-screen alarm on your lock screen.</string>
+    <string name="perm_battery_title">Ignore battery optimizations</string>
+    <string name="perm_battery_body">Prevents aggressive power saving from delaying your alarms.</string>
+    <!-- ============================== Analog clock ============================== -->
+    <string name="studio_clock_kind">Clock type</string>
+    <string name="studio_kind_digital">Digital</string>
+    <string name="studio_kind_analog">Analog</string>
+    <string name="studio_analog_face">Dial</string>
+    <string name="studio_hand_motion">Hand movement</string>
+    <string name="studio_motion_quartz">Quartz (tick)</string>
+    <string name="studio_motion_smooth">Smooth sweep</string>
+    <string name="studio_motion_note">Smooth sweeping only applies in the app and the desk clock. Home-screen widgets always tick once a minute so they cost no battery.</string>
+    <string name="studio_show_second_hand">Second hand</string>
+    <string name="studio_show_numerals">Numerals</string>
+    <string name="face_swiss_minimal">Swiss Minimal</string>
+    <string name="face_classic_roman">Classic Roman</string>
+    <string name="face_luxury_gold">Luxury Gold</string>
+    <string name="face_neon_analog">Neon</string>
+    <string name="face_steampunk">Steampunk</string>
+    <string name="face_digital_hybrid">Digital Hybrid</string>
+    <string name="widget_analog_label">Analog Clock</string>
+    <string name="widget_analog_large_label">Analog Clock (large)</string>
+    <string name="widget_analog_description">Customizable analog dial with six faces, from Swiss minimal to neon.</string>
+    <string name="widget_analog_large_description">The analog dial at 4x4, for a full row of the home screen.</string>
+    <string name="widget_analog_desc">Analog clock face</string>
+    <string name="widget_next_alarm_prefix" translatable="false">⏰ %1$s</string>
+    <string name="widget_battery_percent" translatable="false">%1$d%%</string>
+
+    <!-- ============================== Desk clock ============================== -->
+    <string name="desk_date_pattern" translatable="false">EEEE, MMMM d</string>
+    <string name="desk_clock">Desk clock</string>
+    <string name="desk_tap_for_analog">Tap for analog</string>
+    <string name="desk_tap_for_digital">Tap for digital</string>
+    <string name="desk_brightness">Brightness %1$d%%</string>
+    <string name="desk_exit">Exit</string>
+
+    <!-- ============================== Timer &amp; stopwatch ============================== -->
+    <string name="nav_timer">Timer</string>
+    <string name="timer_tab_timer">Timer</string>
+    <string name="timer_tab_stopwatch">Stopwatch</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_reset">Reset</string>
+    <string name="timer_finished">Time\'s up</string>
+    <string name="timer_stop_alert">Stop</string>
+    <string name="timer_add_minutes">+%1$d min</string>
+    <string name="timer_hint">Add minutes to set the timer.</string>
+    <string name="stopwatch_start">Start</string>
+    <string name="stopwatch_pause">Pause</string>
+    <string name="stopwatch_lap">Lap</string>
+    <string name="stopwatch_reset">Reset</string>
+    <string name="stopwatch_lap_number">Lap %1$d</string>
+    <string name="stopwatch_no_laps">No laps yet</string>
+    <!-- ============================== Phase 2: digital styles ============================== -->
+    <string name="style_seven_segment">7-Segment LED</string>
+    <string name="style_cyberpunk_neon">Cyberpunk Neon</string>
+    <string name="style_dot_matrix">Dot Matrix LED</string>
+    <string name="style_minimal_mono">Minimalist Mono</string>
+    <string name="style_retro_flip">Retro Flip Clock</string>
+    <string name="style_amoled_black">AMOLED Pure Black</string>
+    <string name="style_glassmorphism">Frosted Glass</string>
+    <string name="style_split_flap">Split-Flap Board</string>
+    <string name="style_nixie_tube">Nixie Tubes</string>
+    <string name="style_lcd_segment">LCD Segment</string>
+    <string name="style_led_matrix">LED Matrix</string>
+    <string name="style_retro_terminal">Retro Terminal</string>
+
+    <!-- ============================== Phase 2: world clock ============================== -->
+    <string name="world_same_time">Same time as you</string>
+    <string name="world_diff_ahead">%1$s ahead of you</string>
+    <string name="world_diff_behind">%1$s behind you</string>
+    <string name="world_duration_h">%1$d hr</string>
+    <string name="world_duration_m">%1$d min</string>
+    <string name="world_duration_hm">%1$d hr %2$d min</string>
+    <string name="day_yesterday">Yesterday</string>
+    <string name="day_today">Today</string>
+    <string name="day_tomorrow">Tomorrow</string>
+    <string name="world_comparison_title">Side by side</string>
+
+    <!-- ============================== Phase 2: meeting planner ============================== -->
+    <string name="meeting_show">Find a meeting time</string>
+    <string name="meeting_hide">Hide the meeting planner</string>
+    <string name="meeting_title">Best time to meet</string>
+    <string name="meeting_subtitle">Overlapping working hours, %1$d:00 to %2$d:00 in every city.</string>
+    <string name="meeting_hours_range">%1$d–%2$d</string>
+    <string name="meeting_previous_day">Previous day</string>
+    <string name="meeting_next_day">Next day</string>
+    <string name="meeting_need_cities">Pick at least one city to compare with your own time.</string>
+    <string name="meeting_no_window">No working hour is shared on this day.</string>
+    <string name="meeting_partial_warning">No slot works for everyone. These are the best partial matches.</string>
+    <string name="meeting_window_meta">%1$dh %2$02dm · %3$d of %4$d</string>
+
+    <!-- ============================== Phase 2: dual clock widget ============================== -->
+    <string name="widget_dual_label">Dual Clock</string>
+    <string name="widget_dual_description">Your time and one other city side by side in a 4x1 widget.</string>
+    <string name="widget_dual_here">Here</string>
+    <string name="widget_dual_pick_city">Choose a city</string>
+    <string name="widget_dual_offset_desc">Time difference</string>
+    <string name="widget_time_placeholder" translatable="false">--:--</string>
+    <!-- ============================== Chess clock ============================== -->
+    <string name="timer_tab_chess">Chess</string>
+    <string name="chess_player_a">Player A</string>
+    <string name="chess_player_b">Player B</string>
+    <string name="chess_tap_to_start">Tap to start</string>
+    <string name="chess_your_move">Your move</string>
+    <string name="chess_waiting">Waiting</string>
+    <string name="chess_flagged">Out of time</string>
+    <string name="chess_moves">Move %1$d</string>
+    <string name="chess_pause">Pause</string>
+    <string name="chess_resume">Resume</string>
+    <string name="chess_reset">New game</string>
+    <string name="chess_sound_on">Click sound on</string>
+    <string name="chess_sound_off">Click sound off</string>
+    <string name="chess_time_control">Time control</string>
+    <string name="chess_presets">Presets</string>
+    <string name="chess_custom">Custom</string>
+    <string name="chess_base_minutes">Base time: %1$d min</string>
+    <string name="chess_bonus_seconds">Increment or delay: %1$d s</string>
+    <string name="chess_mode">Mode</string>
+    <string name="chess_apply">Apply</string>
+    <string name="chess_category_bullet">Bullet</string>
+    <string name="chess_category_blitz">Blitz</string>
+    <string name="chess_category_rapid">Rapid</string>
+    <string name="chess_category_classical">Classical</string>
+    <string name="chess_type_sudden_death">Sudden death</string>
+    <string name="chess_type_fischer">Fischer increment</string>
+    <string name="chess_type_simple_delay">Simple delay</string>
+    <string name="chess_type_bronstein">Bronstein delay</string>
+    <string name="chess_explain_sudden_death">A fixed allowance. When it runs out, you lose on time.</string>
+    <string name="chess_explain_fischer">The bonus is added after every move you complete, and it builds up.</string>
+    <string name="chess_explain_simple_delay">Your clock stands still for the delay, then starts counting.</string>
+    <string name="chess_explain_bronstein">Your clock runs at once, then the time you used is refunded, up to the delay.</string>
+    <string name="cancel">Cancel</string>
+    <string name="studio_font_substituted">Not installed — shown in a substitute face</string>
+    <string name="analog_clock_description">Analog clock showing %1$s</string>
+    <string name="slide_to_dismiss_action">Dismiss the alarm</string>
+    <string name="dismiss_button">Dismiss alarm</string>
+</resources>
