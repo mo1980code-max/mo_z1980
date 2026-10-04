@@ -3,6 +3,7 @@ package com.digitalclockpro.presentation.common
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -28,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -91,20 +93,25 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
         }
     }
 
-    if (status.allGranted) return
+    if (status.allSatisfied) return
 
     Card(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer
+            // Only a genuinely broken alarm pipeline gets the alarming red treatment; a pending
+            // optional hardening step is shown as a neutral suggestion.
+            containerColor = if (status.requiredGranted) MaterialTheme.colorScheme.surfaceVariant
+            else MaterialTheme.colorScheme.errorContainer,
+            contentColor = if (status.requiredGranted) MaterialTheme.colorScheme.onSurfaceVariant
+            else MaterialTheme.colorScheme.onErrorContainer
         )
     ) {
         Column(Modifier.padding(16.dp)) {
             FlowRow(verticalArrangement = Arrangement.Center) {
                 Icon(Icons.Filled.WarningAmber, contentDescription = null)
                 Text(
-                    "  Your alarms may not ring",
+                    if (status.requiredGranted) "  Make alarms more reliable"
+                    else "  Your alarms may not ring",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
@@ -114,6 +121,13 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
                 text = status.explanation,
                 style = MaterialTheme.typography.bodyMedium
             )
+            if (!status.batteryOptimizationIgnored) {
+                Text(
+                    text = "Optional: exempting the app from battery optimization makes alarms " +
+                        "more reliable on aggressive power-saving devices.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
             Spacer(Modifier.height(10.dp))
 
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -137,41 +151,88 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
                         )
                     }) { Text("Allow exact alarms") }
                 }
-                if (!status.batteryOptimizationIgnored) {
+                if (!status.fullScreenIntentAllowed) {
                     FilledTonalButton(onClick = {
+                        launchSettings(
+                            context.fullScreenIntentSettingsIntent(),
+                            context.appDetailsSettingsIntent()
+                        )
+                    }) { Text("Allow full-screen alarms") }
+                }
+                if (!status.batteryOptimizationIgnored) {
+                    // Optional, and only ever launched from this explicit user tap.
+                    OutlinedButton(onClick = {
                         launchSettings(
                             context.ignoreBatteryOptimizationsIntent(),
                             Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                         )
-                    }) { Text("Ignore battery optimizations") }
+                    }) { Text("Ignore battery optimizations (optional)") }
                 }
             }
         }
     }
 }
 
-/** Aggregated reliability state of the alarm pipeline. */
+/**
+ * Aggregated reliability state of the alarm pipeline.
+ *
+ * Only [notificationsGranted], [exactAlarmsGranted] and [fullScreenIntentAllowed] are **required**
+ * — without them an alarm genuinely cannot be delivered. Battery-optimization exemption is an
+ * *optional* hardening step: alarms still work without it on stock Android, and Play policy
+ * forbids presenting it as mandatory. It is therefore never part of [requiredGranted] and is only
+ * ever requested by an explicit user tap.
+ */
 data class AlarmReliabilityStatus(
     val notificationsGranted: Boolean,
     val exactAlarmsGranted: Boolean,
+    val fullScreenIntentAllowed: Boolean,
     val batteryOptimizationIgnored: Boolean
 ) {
-    val allGranted: Boolean
-        get() = notificationsGranted && exactAlarmsGranted && batteryOptimizationIgnored
+    val requiredGranted: Boolean
+        get() = notificationsGranted && exactAlarmsGranted && fullScreenIntentAllowed
+
+    /** Nothing at all left to suggest — hides the banner completely. */
+    val allSatisfied: Boolean get() = requiredGranted && batteryOptimizationIgnored
 
     val explanation: String
         get() = buildList {
             if (!notificationsGranted) add("notifications are blocked")
             if (!exactAlarmsGranted) add("exact alarms are not allowed")
-            if (!batteryOptimizationIgnored) add("battery optimization can freeze the app")
-        }.joinToString(", ").replaceFirstChar { it.uppercase() } + "."
+            if (!fullScreenIntentAllowed) add("full-screen alarms are blocked")
+        }.joinToString(", ")
+            .ifBlank { "Alarms are set up correctly" }
+            .replaceFirstChar { it.uppercase() } + "."
 }
 
 fun Context.readAlarmReliabilityStatus() = AlarmReliabilityStatus(
     notificationsGranted = hasNotificationPermission(),
     exactAlarmsGranted = canScheduleExactAlarms(),
+    fullScreenIntentAllowed = canUseFullScreenIntent(),
     batteryOptimizationIgnored = isIgnoringBatteryOptimizations()
 )
+
+/**
+ * Android 14 (API 34) restricted `USE_FULL_SCREEN_INTENT`: it stays pre-granted for alarm and
+ * calling apps, but the user can revoke it per app, which silently downgrades our ringing screen
+ * to a heads-up notification.
+ */
+fun Context.canUseFullScreenIntent(): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        runCatching {
+            (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .canUseFullScreenIntent()
+        }.getOrDefault(true)
+    } else {
+        true
+    }
+
+fun Context.fullScreenIntentSettingsIntent(): Intent =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+            .setData(Uri.parse("package:$packageName"))
+    } else {
+        appDetailsSettingsIntent()
+    }
 
 fun Context.hasNotificationPermission(): Boolean =
     Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||

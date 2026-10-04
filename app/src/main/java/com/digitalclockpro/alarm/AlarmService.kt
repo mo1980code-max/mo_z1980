@@ -4,8 +4,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -13,6 +11,7 @@ import android.util.Log
 import androidx.core.app.ServiceCompat
 import com.digitalclockpro.core.util.AppIntents
 import com.digitalclockpro.core.util.TimeFormatters
+import com.digitalclockpro.data.ringtone.RingtoneRepository
 import com.digitalclockpro.domain.repository.AlarmRepository
 import com.digitalclockpro.domain.usecase.DismissAlarmUseCase
 import com.digitalclockpro.domain.usecase.SnoozeAlarmUseCase
@@ -59,6 +58,7 @@ class AlarmService : Service() {
     @Inject lateinit var sessionManager: AlarmSessionManager
     @Inject lateinit var notifications: AlarmNotifications
     @Inject lateinit var soundPlayer: AlarmSoundPlayer
+    @Inject lateinit var ringtoneRepository: RingtoneRepository
     @Inject lateinit var vibrationController: VibrationController
     @Inject lateinit var snoozeAlarm: SnoozeAlarmUseCase
     @Inject lateinit var dismissAlarm: DismissAlarmUseCase
@@ -123,12 +123,17 @@ class AlarmService : Service() {
                         foregroundServiceType()
                     )
 
-                    soundPlayer.play(
-                        scope = scope,
-                        soundUri = alarm.soundUri?.let(Uri::parse) ?: defaultAlarmUri(),
-                        targetVolumePercent = alarm.volumePercent,
-                        rampSeconds = alarm.volumeRampSeconds
-                    )
+                    // Direct Boot safe: falls back to the system default and finally to the
+                    // tone bundled in the APK when the chosen file cannot be read yet.
+                    // Null only for an explicitly silent (vibration-only) alarm.
+                    ringtoneRepository.resolvePlayableAlarmUri(alarm)?.let { soundUri ->
+                        soundPlayer.play(
+                            scope = scope,
+                            soundUri = soundUri,
+                            targetVolumePercent = alarm.volumePercent,
+                            rampSeconds = alarm.volumeRampSeconds
+                        )
+                    }
                     vibrationController.start(alarm.vibrationPattern)
 
                     // Belt and braces: the full-screen intent is suppressed by some OEMs when the
@@ -246,10 +251,6 @@ class AlarmService : Service() {
         wakeLock?.takeIf { it.isHeld }?.release()
         wakeLock = null
     }
-
-    private fun defaultAlarmUri(): Uri =
-        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
 
     override fun onDestroy() {
         super.onDestroy()

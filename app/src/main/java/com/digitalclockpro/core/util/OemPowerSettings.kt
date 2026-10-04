@@ -39,6 +39,14 @@ object OemPowerSettings {
     }
 
     /**
+     * Framework-free description of a vendor Activity, so candidate selection stays unit-testable
+     * (`ComponentName` is a stubbed class under plain JUnit and throws on construction).
+     */
+    data class VendorComponent(val pkg: String, val cls: String) {
+        fun toComponentName(): ComponentName = ComponentName(pkg, cls)
+    }
+
+    /**
      * A single actionable step shown in the OEM guide.
      *
      * @param available false when the target Activity is absent on this ROM version — the UI
@@ -55,12 +63,11 @@ object OemPowerSettings {
 
     // ------------------------------------------------------------------ vendor detection
 
-    val vendor: Vendor by lazy { detectVendor() }
+    val vendor: Vendor by lazy { detectVendor(Build.MANUFACTURER, Build.BRAND) }
 
-    private fun detectVendor(): Vendor {
-        val manufacturer = Build.MANUFACTURER.lowercase(Locale.ROOT)
-        val brand = Build.BRAND.lowercase(Locale.ROOT)
-        val fingerprint = "$manufacturer $brand"
+    /** Pure function so vendor detection is unit-testable without a device. */
+    fun detectVendor(manufacturer: String?, brand: String?): Vendor {
+        val fingerprint = "${manufacturer.orEmpty()} ${brand.orEmpty()}".lowercase(Locale.ROOT)
         return when {
             listOf("xiaomi", "redmi", "poco").any { fingerprint.contains(it) } -> Vendor.XIAOMI
             listOf("huawei", "honor").any { fingerprint.contains(it) } -> Vendor.HUAWEI
@@ -333,7 +340,20 @@ object OemPowerSettings {
 
     // ------------------------------------------------------------------ helpers
 
-    private fun component(pkg: String, cls: String) = ComponentName(pkg, cls)
+    private fun component(pkg: String, cls: String) = VendorComponent(pkg, cls)
+
+    /**
+     * Pure candidate selection: returns the first component the probe accepts, or null.
+     *
+     * A null result is **not** an error — the step is still shown with its written instructions,
+     * because opening an OEM screen is never a precondition for an alarm to ring.
+     */
+    fun selectComponent(
+        candidates: List<VendorComponent>,
+        isResolvable: (VendorComponent) -> Boolean
+    ): VendorComponent? = candidates.firstOrNull { candidate ->
+        runCatching { isResolvable(candidate) }.getOrDefault(false)
+    }
 
     /** Picks the first candidate component that is actually resolvable on this ROM. */
     private fun Context.action(
@@ -341,15 +361,13 @@ object OemPowerSettings {
         title: String,
         description: String,
         instructions: String,
-        candidates: List<ComponentName>,
+        candidates: List<VendorComponent>,
         fallbackIntent: Intent? = null
     ): OemAction {
-        val resolved = candidates
-            .asSequence()
-            .map { Intent().setComponent(it).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
-            .firstOrNull { it.isResolvable(this) }
-
-        val intent = resolved ?: fallbackIntent?.takeIf { it.isResolvable(this) }
+        val selected = selectComponent(candidates) { candidate ->
+            candidate.toIntent().isResolvable(this)
+        }
+        val intent = selected?.toIntent() ?: fallbackIntent?.takeIf { it.isResolvable(this) }
         return OemAction(
             id = id,
             title = title,
@@ -360,9 +378,25 @@ object OemPowerSettings {
         )
     }
 
+    private fun VendorComponent.toIntent(): Intent =
+        Intent().setComponent(toComponentName()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    /**
+     * `queryIntentActivities` rather than `resolveActivity`: the latter returns the "best" match
+     * and reports null for components that exist but are not exported as defaults, which made
+     * valid vendor screens look unavailable. Even so, the launch itself is still wrapped in a
+     * try/catch at the call site — some ROMs advertise a component and then refuse the start.
+     */
     private fun Intent.isResolvable(context: Context): Boolean = runCatching {
-        context.packageManager
-            .queryIntentActivities(this, PackageManager.MATCH_DEFAULT_ONLY)
-            .isNotEmpty()
+        val pm = context.packageManager
+        pm.queryIntentActivities(this, PackageManager.MATCH_DEFAULT_ONLY).isNotEmpty() ||
+            pm.queryIntentActivities(this, 0).isNotEmpty()
     }.getOrDefault(false)
+
+    /** Shown verbatim in the UI: these screens move between ROM versions. */
+    const val VERSION_VARIANCE_WARNING: String =
+        "These screens are provided by your phone manufacturer and move between ROM versions. " +
+            "If a button does not open the right page, search your system Settings for the " +
+            "setting name shown in each step. Alarms still work without these tweaks on stock Android."
+
 }

@@ -147,14 +147,27 @@ written instructions remain. Progress is ticked off and stored in DataStore. The
 `<package>` entries are declared in `<queries>`, without which Android 11+ visibility rules would
 hide every vendor Activity.
 
+**Direct Boot & custom ringtones** (`data/ringtone/`)
+Imports are copied into **device-protected** `files/ringtones/` (migrated automatically from the
+old credential-protected folder), because an alarm can fire before the first unlock after a
+reboot. `resolvePlayableAlarmUri(alarm)` is the single entry point used by the player:
+user sound (if readable *and* reachable in the current boot state) -> system default (only after
+unlock, it is a MediaStore Uri) -> `res/raw/fallback_alarm.wav` bundled in the APK, which is the
+only asset guaranteed readable during Direct Boot. Silence is an explicit sentinel
+(`AlarmSound.SILENT_URI`) so it is never confused with "no choice yet". The decision table lives
+in the Android-free `AlarmSoundPolicy` and is fully unit-tested.
+
 **Custom ringtones** (`data/ringtone/RingtoneRepository.kt`)
 `ActivityResultContracts.OpenDocument()` picks an audio file; the repository **copies it into
 `filesDir/ringtones/`** (same approach as imported fonts) and the alarm stores a stable `file://`
 Uri. This survives revoked Uri grants, moved/deleted originals, unmounted SD cards and Direct
 Boot, where a credential-protected provider cannot be resolved at all. Imports are validated by
-MIME/extension (mp3, wav, ogg, m4a, aac, flac, opus) and capped at 25 MB; file names are
-sanitised and de-duplicated. `isPlayable()` warns in the editor when a previously chosen sound
-has disappeared.
+MIME/extension (mp3, wav, ogg, m4a, aac, flac, opus) **and magic-number content sniffing**, and
+capped at 25 MB; file names keep Unicode letters but lose path segments, control characters and
+reserved symbols, and are de-duplicated. Reads/deletes are confined to the ringtones folder via
+canonical-path checks. The SAF read grant is taken persistably only while copying, then released.
+`isPlayable()` warns in the editor when a previously chosen sound has disappeared.
+All of these rules are pure functions in `RingtoneFileRules` with JVM unit tests.
 
 ## 6. Permissions
 

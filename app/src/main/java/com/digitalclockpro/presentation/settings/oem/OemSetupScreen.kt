@@ -114,10 +114,15 @@ fun OemSetupScreen(viewModel: OemSetupViewModel = hiltViewModel()) {
                                 "below are done, your alarms can be cancelled while the screen " +
                                 "is off — even with exact alarms granted."
                         } else {
-                            "No vendor-specific restrictions detected. Completing the standard " +
-                                "battery exemption below is still recommended."
+                            "No vendor-specific restrictions detected. The optional steps below " +
+                                "can still make alarms more resilient."
                         },
                         style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        OemPowerSettings.VERSION_VARIANCE_WARNING,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -125,9 +130,10 @@ fun OemSetupScreen(viewModel: OemSetupViewModel = hiltViewModel()) {
 
         item {
             StatusRow(
-                label = "Android battery optimization",
+                label = "Android battery optimization (optional)",
                 satisfied = batteryExempt,
-                actionLabel = "Fix",
+                actionLabel = "Allow",
+                // Only ever launched from this explicit tap – never automatically on screen entry.
                 onAction = { open(context.ignoreBatteryOptimizationsIntent()) }
             )
         }

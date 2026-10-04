@@ -1,5 +1,6 @@
 package com.digitalclockpro.presentation.alarms
 
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -83,7 +84,8 @@ class AlarmEditViewModel @Inject constructor(
      */
     fun importRingtone(uri: Uri) = viewModelScope.launch {
         _sounds.update { it.copy(importing = true, importError = null) }
-        val imported = ringtoneRepository.importFromUri(uri)
+        // The picker grants read access; the repository persists it only while copying.
+        val imported = ringtoneRepository.importFromUri(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         if (imported == null) {
             _sounds.update {
                 it.copy(
@@ -115,8 +117,10 @@ class AlarmEditViewModel @Inject constructor(
     private fun refreshSounds() = viewModelScope.launch {
         _sounds.update {
             it.copy(
-                system = listOf(ringtoneRepository.defaultAlarmSound()) +
-                    ringtoneRepository.systemAlarmSounds(),
+                system = listOf(
+                    ringtoneRepository.defaultAlarmSound(),
+                    ringtoneRepository.bundledFallbackSound()
+                ) + ringtoneRepository.systemAlarmSounds(),
                 imported = ringtoneRepository.importedSounds()
             )
         }

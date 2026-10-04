@@ -224,7 +224,9 @@ private fun SoundSection(
 
     Section("Alarm sound") {
         Text(
-            text = currentTitle.ifBlank { if (currentUri == null) "Silent" else "Default alarm sound" },
+            text = currentTitle.ifBlank {
+                if (currentUri == AlarmSound.SILENT_URI) "Silent" else "Default alarm sound"
+            },
             style = MaterialTheme.typography.bodyMedium
         )
         if (state.currentSoundMissing) {
@@ -265,8 +267,8 @@ private fun SoundSection(
 
         SoundRow(
             title = "Silent",
-            selected = currentUri == null,
-            onClick = { onSelect(AlarmSound(null, "Silent", AlarmSound.Source.SILENT)) }
+            selected = currentUri == AlarmSound.SILENT_URI,
+            onClick = { onSelect(AlarmSound.silent()) }
         )
 
         if (state.imported.isNotEmpty()) {

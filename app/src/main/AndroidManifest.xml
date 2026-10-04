@@ -14,15 +14,21 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!--
+      Used only by an explicit user tap in the reliability banner / OEM guide
+      (Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS). Play policy exception:
+      IMPORTANT_BACKGROUND_FUNCTION - an alarm clock must ring at an exact time while the
+      device is idle. The app is fully functional without it.
+    -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <!-- Optional weather + custom font import -->
+    <!--
+      Optional weather only. Custom ringtones and fonts are picked through the Storage Access
+      Framework (ACTION_OPEN_DOCUMENT), which grants per-file access, so neither
+      READ_EXTERNAL_STORAGE nor READ_MEDIA_AUDIO is required.
+    -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
 
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
 
@@ -31,10 +37,11 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.APP_CALENDAR" />
         </intent>
-        <intent>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.APP_CALCULATOR" />
-        </intent>
+        <!-- Probed by WidgetTapActions for the "tap weather" action -->
+        <package android:name="com.google.android.apps.weather" />
+        <package android:name="com.weather.Weather" />
+        <package android:name="com.samsung.android.weather" />
+
         <!-- Audio picker for custom alarm ringtones -->
         <intent>
             <action android:name="android.intent.action.OPEN_DOCUMENT" />
