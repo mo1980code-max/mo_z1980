@@ -83,9 +83,12 @@ class OemPowerSettingsTest {
     }
 
     @Test
-    fun `vendors needing manual whitelisting are flagged`() {
-        val needsHelp = listOf(Vendor.XIAOMI, Vendor.HUAWEI, Vendor.SAMSUNG, Vendor.OPPO)
-        needsHelp.forEach { assertTrue(it.displayName.isNotBlank()) }
-        assertEquals("Your device", Vendor.OTHER.displayName)
+    fun `every vendor has a localizable label`() {
+        // Labels are string resources so the guide can be translated; brand names stay as-is.
+        Vendor.entries.forEach { assertTrue(it.name, it.labelRes != 0) }
+        assertEquals(
+            Vendor.entries.size,
+            Vendor.entries.map { it.labelRes }.distinct().size
+        )
     }
 }

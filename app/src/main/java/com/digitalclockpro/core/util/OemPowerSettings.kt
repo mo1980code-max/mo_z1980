@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.StringRes
+import com.digitalclockpro.R
 import android.provider.Settings
 import java.util.Locale
 
@@ -25,18 +27,21 @@ import java.util.Locale
  */
 object OemPowerSettings {
 
-    enum class Vendor(val displayName: String) {
-        XIAOMI("Xiaomi / Redmi / POCO"),
-        HUAWEI("Huawei / Honor"),
-        SAMSUNG("Samsung"),
-        OPPO("OPPO / realme"),
-        ONEPLUS("OnePlus"),
-        VIVO("vivo / iQOO"),
-        ASUS("ASUS"),
-        NOKIA("Nokia / HMD"),
-        LETV("LeEco"),
-        OTHER("Your device")
+    enum class Vendor(@StringRes val labelRes: Int) {
+        XIAOMI(R.string.vendor_xiaomi),
+        HUAWEI(R.string.vendor_huawei),
+        SAMSUNG(R.string.vendor_samsung),
+        OPPO(R.string.vendor_oppo),
+        ONEPLUS(R.string.vendor_oneplus),
+        VIVO(R.string.vendor_vivo),
+        ASUS(R.string.vendor_asus),
+        NOKIA(R.string.vendor_nokia),
+        LETV(R.string.vendor_letv),
+        OTHER(R.string.vendor_other)
     }
+
+    /** Localized vendor name. Brand names are proper nouns and stay untranslated. */
+    fun vendorLabel(context: Context): String = context.getString(vendor.labelRes)
 
     /**
      * Framework-free description of a vendor Activity, so candidate selection stays unit-testable
@@ -109,11 +114,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "miui_autostart",
-                        title = "Enable Autostart",
-                        description = "MIUI blocks the alarm from restarting after the phone " +
-                            "reboots or the app is swiped away.",
-                        instructions = "Security → Permissions → Autostart → turn ON " +
-                            "“Digital Clock Pro”.",
+                        title = context.getString(R.string.oem_miui_autostart_title),
+                        description = context.getString(R.string.oem_miui_autostart_desc),
+                        instructions = context.getString(R.string.oem_miui_autostart_steps),
                         candidates = listOf(
                             component("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"),
                             component("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartDetailActivity")
@@ -123,11 +126,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "miui_battery_saver",
-                        title = "Set battery saver to “No restrictions”",
-                        description = "MIUI’s own power keeper is separate from Android’s " +
-                            "battery optimization.",
-                        instructions = "Find “Digital Clock Pro” → Battery saver → " +
-                            "choose “No restrictions”.",
+                        title = context.getString(R.string.oem_miui_battery_title),
+                        description = context.getString(R.string.oem_miui_battery_desc),
+                        instructions = context.getString(R.string.oem_miui_battery_steps),
                         candidates = listOf(
                             component("com.miui.powerkeeper", "com.miui.powerkeeper.ui.HiddenAppsConfigActivity"),
                             component("com.miui.powerkeeper", "com.miui.powerkeeper.ui.HiddenAppsContainerManagementActivity")
@@ -137,10 +138,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "miui_lock_recents",
-                        title = "Lock the app in Recents",
-                        description = "Prevents “clear all” from killing the ringing alarm.",
-                        instructions = "Open Recents → swipe down on Digital Clock Pro → " +
-                            "tap the padlock icon.",
+                        title = context.getString(R.string.oem_miui_lock_title),
+                        description = context.getString(R.string.oem_miui_lock_desc),
+                        instructions = context.getString(R.string.oem_miui_lock_steps),
                         candidates = emptyList()
                     )
                 )
@@ -150,11 +150,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "huawei_startup",
-                        title = "Manage app launch manually",
-                        description = "EMUI closes apps it manages automatically.",
-                        instructions = "App launch → turn OFF “Manage automatically” for " +
-                            "Digital Clock Pro → enable all three switches " +
-                            "(Auto-launch, Secondary launch, Run in background).",
+                        title = context.getString(R.string.oem_huawei_startup_title),
+                        description = context.getString(R.string.oem_huawei_startup_desc),
+                        instructions = context.getString(R.string.oem_huawei_startup_steps),
                         candidates = listOf(
                             component("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"),
                             component("com.huawei.systemmanager", "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity")
@@ -164,9 +162,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "huawei_protected",
-                        title = "Add to protected apps",
-                        description = "Keeps the alarm service alive when the screen is off.",
-                        instructions = "Protected apps → enable Digital Clock Pro.",
+                        title = context.getString(R.string.oem_huawei_protected_title),
+                        description = context.getString(R.string.oem_huawei_protected_desc),
+                        instructions = context.getString(R.string.oem_huawei_protected_steps),
                         candidates = listOf(
                             component("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"),
                             component("com.huawei.systemmanager", "com.huawei.systemmanager.power.ui.HwPowerManagerActivity")
@@ -179,11 +177,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "samsung_sleeping",
-                        title = "Remove from “Sleeping apps”",
-                        description = "One UI puts rarely used apps to sleep, which cancels " +
-                            "their alarms.",
-                        instructions = "Battery → Background usage limits → make sure " +
-                            "Digital Clock Pro is NOT in “Sleeping” or “Deep sleeping” apps.",
+                        title = context.getString(R.string.oem_samsung_sleeping_title),
+                        description = context.getString(R.string.oem_samsung_sleeping_desc),
+                        instructions = context.getString(R.string.oem_samsung_sleeping_steps),
                         candidates = listOf(
                             component("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity"),
                             component("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity"),
@@ -194,10 +190,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "samsung_device_care",
-                        title = "Turn off “Put unused apps to sleep”",
-                        description = "Device Care re-sleeps apps automatically every few days.",
-                        instructions = "Device care → Battery → Background usage limits → " +
-                            "turn OFF “Put unused apps to sleep”.",
+                        title = context.getString(R.string.oem_samsung_care_title),
+                        description = context.getString(R.string.oem_samsung_care_desc),
+                        instructions = context.getString(R.string.oem_samsung_care_steps),
                         candidates = listOf(
                             component("com.samsung.android.lool", "com.samsung.android.sm.ui.cstyleboard.SmartManagerDashBoardActivity")
                         )
@@ -209,9 +204,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "oppo_startup",
-                        title = "Allow auto-startup",
-                        description = "ColorOS blocks background start after reboot.",
-                        instructions = "Startup manager → enable Digital Clock Pro.",
+                        title = context.getString(R.string.oem_oppo_startup_title),
+                        description = context.getString(R.string.oem_oppo_startup_desc),
+                        instructions = context.getString(R.string.oem_oppo_startup_steps),
                         candidates = listOf(
                             component("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"),
                             component("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity"),
@@ -222,10 +217,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "oppo_power",
-                        title = "Disable battery restrictions",
-                        description = "Set the app to “Allow background running”.",
-                        instructions = "Power saver → App battery management → " +
-                            "Digital Clock Pro → allow background running + auto-launch.",
+                        title = context.getString(R.string.oem_oppo_power_title),
+                        description = context.getString(R.string.oem_oppo_power_desc),
+                        instructions = context.getString(R.string.oem_oppo_power_steps),
                         candidates = listOf(
                             component("com.coloros.oppoguardelf", "com.coloros.powermanager.fuelgaue.PowerUsageModelActivity"),
                             component("com.coloros.oppoguardelf", "com.coloros.powermanager.fuelgaue.PowerConsumptionActivity")
@@ -238,9 +232,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "oneplus_chain",
-                        title = "Allow auto-launch",
-                        description = "OxygenOS “Chain launch” control.",
-                        instructions = "Auto-launch → enable Digital Clock Pro.",
+                        title = context.getString(R.string.oem_oneplus_chain_title),
+                        description = context.getString(R.string.oem_oneplus_chain_desc),
+                        instructions = context.getString(R.string.oem_oneplus_chain_steps),
                         candidates = listOf(
                             component("com.oneplus.security", "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity")
                         )
@@ -249,10 +243,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "oneplus_battery",
-                        title = "Set battery to “Don’t optimize”",
-                        description = "Advanced optimization also needs to be off.",
-                        instructions = "Battery → Battery optimization → Digital Clock Pro → " +
-                            "Don’t optimize.",
+                        title = context.getString(R.string.oem_oneplus_battery_title),
+                        description = context.getString(R.string.oem_oneplus_battery_desc),
+                        instructions = context.getString(R.string.oem_oneplus_battery_steps),
                         candidates = emptyList()
                     )
                 )
@@ -262,9 +255,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "vivo_bg_start",
-                        title = "Allow background start-up",
-                        description = "Funtouch OS blocks background launches by default.",
-                        instructions = "Permission manager → Autostart → enable Digital Clock Pro.",
+                        title = context.getString(R.string.oem_vivo_bgstart_title),
+                        description = context.getString(R.string.oem_vivo_bgstart_desc),
+                        instructions = context.getString(R.string.oem_vivo_bgstart_steps),
                         candidates = listOf(
                             component("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"),
                             component("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager")
@@ -274,10 +267,9 @@ object OemPowerSettings {
                 add(
                     context.action(
                         id = "vivo_whitelist",
-                        title = "Add to high background power consumption list",
-                        description = "Stops the system from freezing the alarm service.",
-                        instructions = "Battery → High background power consumption → " +
-                            "enable Digital Clock Pro.",
+                        title = context.getString(R.string.oem_vivo_whitelist_title),
+                        description = context.getString(R.string.oem_vivo_whitelist_desc),
+                        instructions = context.getString(R.string.oem_vivo_whitelist_steps),
                         candidates = listOf(
                             component("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"),
                             component("com.vivo.pem", "com.vivo.pem.activity.PemAutoStartActivity")
@@ -289,9 +281,9 @@ object OemPowerSettings {
             Vendor.ASUS -> add(
                 context.action(
                     id = "asus_autostart",
-                    title = "Enable Auto-start",
-                    description = "ZenUI Mobile Manager auto-start list.",
-                    instructions = "Mobile Manager → Auto-start manager → allow Digital Clock Pro.",
+                    title = context.getString(R.string.oem_asus_autostart_title),
+                    description = context.getString(R.string.oem_asus_autostart_desc),
+                    instructions = context.getString(R.string.oem_asus_autostart_steps),
                     candidates = listOf(
                         component("com.asus.mobilemanager", "com.asus.mobilemanager.autostart.AutoStartActivity"),
                         component("com.asus.mobilemanager", "com.asus.mobilemanager.entry.FunctionActivity")
@@ -302,9 +294,9 @@ object OemPowerSettings {
             Vendor.LETV -> add(
                 context.action(
                     id = "letv_autoboot",
-                    title = "Enable auto-boot",
-                    description = "EUI background app protection.",
-                    instructions = "Autoboot management → enable Digital Clock Pro.",
+                    title = context.getString(R.string.oem_letv_autoboot_title),
+                    description = context.getString(R.string.oem_letv_autoboot_desc),
+                    instructions = context.getString(R.string.oem_letv_autoboot_steps),
                     candidates = listOf(
                         component("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity")
                     )
@@ -318,20 +310,20 @@ object OemPowerSettings {
         add(
             context.action(
                 id = "aosp_battery",
-                title = "Android battery optimization",
-                description = "The standard exemption every Android version supports.",
-                instructions = "Choose “All apps” → Digital Clock Pro → Don’t optimize.",
-                candidates = emptyList(),
+                        title = context.getString(R.string.oem_aosp_battery_title),
+                        description = context.getString(R.string.oem_aosp_battery_desc),
+                        instructions = context.getString(R.string.oem_aosp_battery_steps),
+                        candidates = emptyList(),
                 fallbackIntent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
             )
         )
         add(
             context.action(
                 id = "app_details",
-                title = "App info",
-                description = "Manual access to notifications, alarms and battery settings.",
-                instructions = "Use this if any button above does not open.",
-                candidates = emptyList(),
+                        title = context.getString(R.string.oem_app_details_title),
+                        description = context.getString(R.string.oem_app_details_desc),
+                        instructions = context.getString(R.string.oem_app_details_steps),
+                        candidates = emptyList(),
                 fallbackIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     .setData(Uri.parse("package:${context.packageName}"))
             )
@@ -393,10 +385,5 @@ object OemPowerSettings {
             pm.queryIntentActivities(this, 0).isNotEmpty()
     }.getOrDefault(false)
 
-    /** Shown verbatim in the UI: these screens move between ROM versions. */
-    const val VERSION_VARIANCE_WARNING: String =
-        "These screens are provided by your phone manufacturer and move between ROM versions. " +
-            "If a button does not open the right page, search your system Settings for the " +
-            "setting name shown in each step. Alarms still work without these tweaks on stock Android."
 
 }

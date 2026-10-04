@@ -38,6 +38,8 @@ import com.digitalclockpro.presentation.common.AlarmPermissionBanner
 import com.digitalclockpro.presentation.common.rememberCurrentTime
 import java.time.Instant
 import java.time.ZoneId
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
 
 /**
  * Main dashboard: a large animated clock on top, the next-alarm card in the middle and quick
@@ -98,7 +100,7 @@ fun DashboardScreen(
             }
         }
         Text(
-            text = TimeFormatters.formatDate(now, "EEEE, MMMM d"),
+            text = TimeFormatters.formatDate(now, stringResource(R.string.dashboard_date_pattern)),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -123,9 +125,9 @@ fun DashboardScreen(
                     Column(Modifier.padding(start = 14.dp)) {
                         val alarm = state.nextAlarm
                         if (alarm == null) {
-                            Text("No upcoming alarm", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.dashboard_no_upcoming_alarm), style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "Tap to create one",
+                                stringResource(R.string.dashboard_tap_to_create),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -164,18 +166,17 @@ fun DashboardScreen(
         ) {
             OutlinedButton(onClick = onOpenAlarms, modifier = Modifier.weight(1f)) {
                 Icon(Icons.Filled.Alarm, contentDescription = null)
-                Text("  Alarms (${state.enabledAlarmCount})")
+                Text(stringResource(R.string.dashboard_alarms_count, state.enabledAlarmCount))
             }
             OutlinedButton(onClick = onOpenWorldClock, modifier = Modifier.weight(1f)) {
                 Icon(Icons.Filled.Widgets, contentDescription = null)
-                Text("  World")
+                Text(stringResource(R.string.dashboard_world))
             }
         }
 
         Spacer(Modifier.height(20.dp))
         Text(
-            text = "Long-press your home screen → Widgets → Digital Clock Pro to add a widget, " +
-                "then open the Widget Studio to style it.",
+            text = stringResource(R.string.dashboard_widget_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

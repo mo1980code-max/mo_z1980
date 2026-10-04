@@ -52,13 +52,23 @@ import com.digitalclockpro.domain.model.WidgetConfig
 import com.digitalclockpro.domain.model.WidgetLayout
 import com.digitalclockpro.presentation.common.rememberCurrentTime
 import com.digitalclockpro.widget.FontCatalog
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
 
-private val TABS = listOf("Presets", "Font", "Colors", "Background", "Layout", "Tap actions")
+/** Tab titles as resource ids; resolved with `stringResource` inside the composable. */
+private val TAB_TITLES = listOf(
+    R.string.tab_presets,
+    R.string.tab_font,
+    R.string.tab_colors,
+    R.string.tab_background,
+    R.string.tab_layout,
+    R.string.tab_tap_actions
+)
 
 /**
  * Widget Customizer Studio: a live WYSIWYG preview pinned to the top with a tabbed editor below.
  * Every edit mutates the in-memory [WidgetConfig], so the preview updates instantly; nothing is
- * persisted until "Save widget".
+ * persisted until stringResource(R.string.save_widget).
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -75,8 +85,8 @@ fun WidgetStudioScreen(
         LivePreview(config, Modifier.padding(16.dp))
 
         ScrollableTabRow(selectedTabIndex = tab, edgePadding = 12.dp) {
-            TABS.forEachIndexed { index, title ->
-                Tab(selected = tab == index, onClick = { tab = index }, text = { Text(title) })
+            TAB_TITLES.forEachIndexed { index, titleRes ->
+                Tab(selected = tab == index, onClick = { tab = index }, text = { Text(stringResource(titleRes)) })
             }
         }
 
@@ -97,7 +107,7 @@ fun WidgetStudioScreen(
         Button(
             onClick = { viewModel.save(onSaved) },
             modifier = Modifier.fillMaxWidth().padding(16.dp)
-        ) { Text("Save widget") }
+        ) { Text(stringResource(R.string.save_widget)) }
     }
 }
 
@@ -146,9 +156,9 @@ private fun LivePreview(config: WidgetConfig, modifier: Modifier = Modifier) {
             }
             val info = buildList {
                 if (config.showDate) add(TimeFormatters.formatDate(now, config.datePattern))
-                if (config.showBattery && !config.batteryAsBar) add("87%")
-                if (config.showNextAlarm) add("⏰ 7:00 AM")
-                if (config.showWeather) add(if (config.weatherUnitCelsius) "24°C Clear" else "75°F Clear")
+                if (config.showBattery && !config.batteryAsBar) add(stringResource(R.string.studio_preview_battery))
+                if (config.showNextAlarm) add(stringResource(R.string.studio_preview_alarm))
+                if (config.showWeather) add(if (config.weatherUnitCelsius) stringResource(R.string.studio_preview_weather_c) else stringResource(R.string.studio_preview_weather_f))
             }
             if (info.isNotEmpty()) {
                 Text(
@@ -178,7 +188,7 @@ private fun PresetsTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FontTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
-    Text("Bundled fonts (${FontCatalog.fonts.size})", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.studio_bundled_fonts, FontCatalog.fonts.size), style = MaterialTheme.typography.titleSmall)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FontCatalog.fonts.forEach { font ->
             FilterChip(
@@ -188,63 +198,63 @@ private fun FontTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
             )
         }
     }
-    LabeledSlider("Time size: ${config.timeTextSizeSp.toInt()}sp", config.timeTextSizeSp, 16f, 140f) {
+    LabeledSlider(stringResource(R.string.studio_time_size, config.timeTextSizeSp.toInt()), config.timeTextSizeSp, 16f, 140f) {
         vm.update { c -> c.copy(timeTextSizeSp = it) }
     }
-    LabeledSlider("Date size: ${config.dateTextSizeSp.toInt()}sp", config.dateTextSizeSp, 8f, 32f) {
+    LabeledSlider(stringResource(R.string.studio_date_size, config.dateTextSizeSp.toInt()), config.dateTextSizeSp, 8f, 32f) {
         vm.update { c -> c.copy(dateTextSizeSp = it) }
     }
-    LabeledSlider("Letter spacing", config.letterSpacing, -0.05f, 0.4f) {
+    LabeledSlider(stringResource(R.string.studio_letter_spacing), config.letterSpacing, -0.05f, 0.4f) {
         vm.update { c -> c.copy(letterSpacing = it) }
     }
 }
 
 @Composable
 private fun ColorsTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
-    HexColorField("Time color", config.timeColor) { vm.update { c -> c.copy(timeColor = it) } }
-    HexColorField("Date color", config.dateColor) { vm.update { c -> c.copy(dateColor = it) } }
-    HexColorField("Accent color", config.accentColor) { vm.update { c -> c.copy(accentColor = it) } }
-    SwitchRow("Gradient", config.gradientEnabled) { vm.update { c -> c.copy(gradientEnabled = it) } }
+    HexColorField(stringResource(R.string.studio_time_color), config.timeColor) { vm.update { c -> c.copy(timeColor = it) } }
+    HexColorField(stringResource(R.string.studio_date_color), config.dateColor) { vm.update { c -> c.copy(dateColor = it) } }
+    HexColorField(stringResource(R.string.studio_accent_color), config.accentColor) { vm.update { c -> c.copy(accentColor = it) } }
+    SwitchRow(stringResource(R.string.studio_gradient), config.gradientEnabled) { vm.update { c -> c.copy(gradientEnabled = it) } }
     if (config.gradientEnabled) {
-        HexColorField("Gradient end", config.gradientEndColor) {
+        HexColorField(stringResource(R.string.studio_gradient_end), config.gradientEndColor) {
             vm.update { c -> c.copy(gradientEndColor = it) }
         }
     }
-    SwitchRow("Neon glow", config.glowEnabled) { vm.update { c -> c.copy(glowEnabled = it) } }
+    SwitchRow(stringResource(R.string.studio_glow), config.glowEnabled) { vm.update { c -> c.copy(glowEnabled = it) } }
     if (config.glowEnabled) {
-        LabeledSlider("Glow radius", config.glowRadius, 1f, 40f) {
+        LabeledSlider(stringResource(R.string.studio_glow_radius), config.glowRadius, 1f, 40f) {
             vm.update { c -> c.copy(glowRadius = it) }
         }
     }
-    SwitchRow("Drop shadow", config.shadowEnabled) { vm.update { c -> c.copy(shadowEnabled = it) } }
+    SwitchRow(stringResource(R.string.studio_shadow), config.shadowEnabled) { vm.update { c -> c.copy(shadowEnabled = it) } }
     if (config.shadowEnabled) {
-        LabeledSlider("Shadow dx", config.shadowDx, -10f, 10f) { vm.update { c -> c.copy(shadowDx = it) } }
-        LabeledSlider("Shadow dy", config.shadowDy, -10f, 10f) { vm.update { c -> c.copy(shadowDy = it) } }
-        LabeledSlider("Shadow blur", config.shadowRadius, 0f, 20f) {
+        LabeledSlider(stringResource(R.string.studio_shadow_dx), config.shadowDx, -10f, 10f) { vm.update { c -> c.copy(shadowDx = it) } }
+        LabeledSlider(stringResource(R.string.studio_shadow_dy), config.shadowDy, -10f, 10f) { vm.update { c -> c.copy(shadowDy = it) } }
+        LabeledSlider(stringResource(R.string.studio_shadow_blur), config.shadowRadius, 0f, 20f) {
             vm.update { c -> c.copy(shadowRadius = it) }
         }
     }
-    SwitchRow("Follow Material You colors", config.useDynamicColor) {
+    SwitchRow(stringResource(R.string.studio_dynamic_color), config.useDynamicColor) {
         vm.update { c -> c.copy(useDynamicColor = it) }
     }
 }
 
 @Composable
 private fun BackgroundTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
-    HexColorField("Background", config.backgroundColor) {
+    HexColorField(stringResource(R.string.studio_background), config.backgroundColor) {
         vm.update { c -> c.copy(backgroundColor = it) }
     }
-    LabeledSlider("Opacity: ${(config.backgroundAlpha * 100 / 255)}%", config.backgroundAlpha.toFloat(), 0f, 255f) {
+    LabeledSlider(stringResource(R.string.studio_opacity, config.backgroundAlpha * 100 / 255), config.backgroundAlpha.toFloat(), 0f, 255f) {
         vm.update { c -> c.copy(backgroundAlpha = it.toInt()) }
     }
-    LabeledSlider("Corner radius: ${config.cornerRadiusDp.toInt()}dp", config.cornerRadiusDp, 0f, 48f) {
+    LabeledSlider(stringResource(R.string.studio_corner_radius, config.cornerRadiusDp.toInt()), config.cornerRadiusDp, 0f, 48f) {
         vm.update { c -> c.copy(cornerRadiusDp = it) }
     }
-    SwitchRow("Frosted glass", config.frostedGlass) { vm.update { c -> c.copy(frostedGlass = it) } }
-    SwitchRow("Border", config.borderEnabled) { vm.update { c -> c.copy(borderEnabled = it) } }
+    SwitchRow(stringResource(R.string.studio_frosted), config.frostedGlass) { vm.update { c -> c.copy(frostedGlass = it) } }
+    SwitchRow(stringResource(R.string.studio_border), config.borderEnabled) { vm.update { c -> c.copy(borderEnabled = it) } }
     if (config.borderEnabled) {
-        HexColorField("Border color", config.borderColor) { vm.update { c -> c.copy(borderColor = it) } }
-        LabeledSlider("Border width", config.borderWidthDp, 0.5f, 6f) {
+        HexColorField(stringResource(R.string.studio_border_color), config.borderColor) { vm.update { c -> c.copy(borderColor = it) } }
+        LabeledSlider(stringResource(R.string.studio_border_width), config.borderWidthDp, 0.5f, 6f) {
             vm.update { c -> c.copy(borderWidthDp = it) }
         }
     }
@@ -253,7 +263,7 @@ private fun BackgroundTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LayoutTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
-    Text("Size", style = MaterialTheme.typography.titleSmall)
+    Text(stringResource(R.string.studio_size), style = MaterialTheme.typography.titleSmall)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         WidgetLayout.entries.forEach { layout ->
             FilterChip(
@@ -263,12 +273,12 @@ private fun LayoutTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
             )
         }
     }
-    SwitchRow("24-hour format", config.use24Hour) { vm.update { c -> c.copy(use24Hour = it) } }
-    SwitchRow("Show seconds", config.showSeconds) { vm.update { c -> c.copy(showSeconds = it) } }
-    SwitchRow("Show AM/PM", config.showAmPm) { vm.update { c -> c.copy(showAmPm = it) } }
-    SwitchRow("Show date", config.showDate) { vm.update { c -> c.copy(showDate = it) } }
+    SwitchRow(stringResource(R.string.studio_24h), config.use24Hour) { vm.update { c -> c.copy(use24Hour = it) } }
+    SwitchRow(stringResource(R.string.studio_show_seconds), config.showSeconds) { vm.update { c -> c.copy(showSeconds = it) } }
+    SwitchRow(stringResource(R.string.studio_show_ampm), config.showAmPm) { vm.update { c -> c.copy(showAmPm = it) } }
+    SwitchRow(stringResource(R.string.studio_show_date), config.showDate) { vm.update { c -> c.copy(showDate = it) } }
     if (config.showDate) {
-        Text("Date format", style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.studio_date_format), style = MaterialTheme.typography.titleSmall)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TimeFormatters.commonDatePatterns.forEach { pattern ->
                 FilterChip(
@@ -279,14 +289,14 @@ private fun LayoutTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
             }
         }
     }
-    SwitchRow("Battery indicator", config.showBattery) { vm.update { c -> c.copy(showBattery = it) } }
+    SwitchRow(stringResource(R.string.studio_battery), config.showBattery) { vm.update { c -> c.copy(showBattery = it) } }
     if (config.showBattery) {
-        SwitchRow("Show as bar", config.batteryAsBar) { vm.update { c -> c.copy(batteryAsBar = it) } }
+        SwitchRow(stringResource(R.string.studio_battery_bar), config.batteryAsBar) { vm.update { c -> c.copy(batteryAsBar = it) } }
     }
-    SwitchRow("Next alarm", config.showNextAlarm) { vm.update { c -> c.copy(showNextAlarm = it) } }
-    SwitchRow("Weather", config.showWeather) { vm.update { c -> c.copy(showWeather = it) } }
+    SwitchRow(stringResource(R.string.studio_next_alarm), config.showNextAlarm) { vm.update { c -> c.copy(showNextAlarm = it) } }
+    SwitchRow(stringResource(R.string.studio_weather), config.showWeather) { vm.update { c -> c.copy(showWeather = it) } }
     if (config.showWeather) {
-        SwitchRow("Celsius", config.weatherUnitCelsius) {
+        SwitchRow(stringResource(R.string.studio_celsius), config.weatherUnitCelsius) {
             vm.update { c -> c.copy(weatherUnitCelsius = it) }
         }
     }
@@ -296,10 +306,10 @@ private fun LayoutTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
 @Composable
 private fun TapActionsTab(config: WidgetConfig, vm: WidgetStudioViewModel) {
     val regions = listOf(
-        Triple(1, "Tap hours", config.tapHours),
-        Triple(2, "Tap minutes", config.tapMinutes),
-        Triple(3, "Tap date", config.tapDate),
-        Triple(4, "Tap weather", config.tapWeather)
+        Triple(1, stringResource(R.string.studio_tap_hours), config.tapHours),
+        Triple(2, stringResource(R.string.studio_tap_minutes), config.tapMinutes),
+        Triple(3, stringResource(R.string.studio_tap_date), config.tapDate),
+        Triple(4, stringResource(R.string.studio_tap_weather), config.tapWeather)
     )
     regions.forEach { (region, title, current) ->
         Text(title, style = MaterialTheme.typography.titleSmall)

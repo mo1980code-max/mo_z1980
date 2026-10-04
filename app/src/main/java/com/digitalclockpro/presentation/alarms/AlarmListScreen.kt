@@ -37,6 +37,8 @@ import com.digitalclockpro.domain.model.DismissChallenge
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.Locale
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
 
 @Composable
 fun AlarmListScreen(
@@ -49,16 +51,16 @@ fun AlarmListScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = onAddAlarm) {
-                Icon(Icons.Filled.Add, contentDescription = "Add alarm")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_alarm))
             }
         }
     ) { padding ->
         if (state.alarms.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("No alarms yet", style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.no_alarms), style = MaterialTheme.typography.titleLarge)
                     Text(
-                        "Tap + to create your first alarm.",
+                        stringResource(R.string.no_alarms_hint),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -112,11 +114,13 @@ private fun AlarmRow(
                     else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = buildString {
-                        append(repeatLabel(alarm))
-                        if (alarm.label.isNotBlank()) append(" • ${alarm.label}")
-                        challengeLabel(alarm.challenge)?.let { append(" • $it") }
-                    },
+                    // Hoisted out of buildString: @Composable calls cannot run inside a lambda
+                    // that is not itself composable.
+                    text = listOfNotNull(
+                        repeatLabel(alarm),
+                        alarm.label.takeIf { it.isNotBlank() },
+                        challengeLabel(alarm.challenge)
+                    ).joinToString(stringResource(R.string.bullet_separator)),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -132,27 +136,36 @@ private fun AlarmRow(
             }
             Switch(checked = alarm.enabled, onCheckedChange = onToggle)
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = "Delete alarm")
+                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete_alarm))
             }
         }
     }
 }
 
+/**
+ * Composable so the labels follow the app locale; day names come from [DayOfWeek.getDisplayName]
+ * with the default locale, which is already localized (and RTL-ordered) by the JDK.
+ */
+@Composable
 private fun repeatLabel(alarm: Alarm): String = when {
-    alarm.repeatDays.isEmpty() -> "Once"
-    alarm.repeatDays.size == 7 -> "Every day"
+    alarm.repeatDays.isEmpty() -> stringResource(R.string.repeat_once)
+    alarm.repeatDays.size == 7 -> stringResource(R.string.repeat_every_day)
     alarm.repeatDays == setOf(
         DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
         DayOfWeek.THURSDAY, DayOfWeek.FRIDAY
-    ) -> "Weekdays"
-    alarm.repeatDays == setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY) -> "Weekends"
+    ) -> stringResource(R.string.repeat_weekdays)
+    alarm.repeatDays == setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY) ->
+        stringResource(R.string.repeat_weekends)
     else -> DayOfWeek.entries.filter { it in alarm.repeatDays }
         .joinToString(" ") { it.getDisplayName(TextStyle.SHORT, Locale.getDefault()) }
 }
 
+@Composable
 private fun challengeLabel(challenge: DismissChallenge): String? = when (challenge) {
-    is DismissChallenge.Math -> "Math ×${challenge.problemCount}"
-    is DismissChallenge.Shake -> "Shake ×${challenge.shakeCount}"
-    is DismissChallenge.Sequence -> "Memory"
+    is DismissChallenge.Math ->
+        stringResource(R.string.challenge_math_short, challenge.problemCount)
+    is DismissChallenge.Shake ->
+        stringResource(R.string.challenge_shake_short, challenge.shakeCount)
+    is DismissChallenge.Sequence -> stringResource(R.string.challenge_memory_short)
     DismissChallenge.None -> null
 }

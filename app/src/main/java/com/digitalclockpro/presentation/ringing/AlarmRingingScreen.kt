@@ -44,6 +44,10 @@ import com.digitalclockpro.alarm.challenge.ShakeDetector
 import com.digitalclockpro.core.util.TimeFormatters
 import com.digitalclockpro.domain.model.DismissChallenge
 import com.digitalclockpro.presentation.common.rememberCurrentTime
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 
 @Composable
 fun AlarmRingingScreen(
@@ -73,7 +77,7 @@ fun AlarmRingingScreen(
                 color = Color(0xFFE0E0E0)
             )
             Text(
-                text = state.alarm?.label?.takeIf { it.isNotBlank() } ?: "Alarm",
+                text = state.alarm?.label?.takeIf { it.isNotBlank() } ?: stringResource(R.string.alarm),
                 fontSize = 20.sp,
                 color = Color(0xFF9E9E9E)
             )
@@ -94,8 +98,12 @@ fun AlarmRingingScreen(
             ) {
                 Text(
                     if (state.snoozesLeft > 0)
-                        "Snooze ${state.alarm?.snoozeMinutes ?: 9} min (${state.snoozesLeft} left)"
-                    else "No snoozes left",
+                        stringResource(
+                        R.string.snooze_minutes_left,
+                        state.alarm?.snoozeMinutes ?: 9,
+                        state.snoozesLeft
+                    )
+                    else stringResource(R.string.no_snoozes_left),
                     fontSize = 18.sp
                 )
             }
@@ -109,7 +117,11 @@ private fun MathChallengeUi(state: RingingUiState, onSubmit: (String) -> Unit) {
     var input by remember { mutableStateOf("") }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            "Problem ${state.problemIndex + 1} of ${state.problems.size}",
+            stringResource(
+                R.string.ringing_problem_index,
+                state.problemIndex + 1,
+                state.problems.size
+            ),
             color = Color(0xFF9E9E9E)
         )
         Text(
@@ -131,7 +143,7 @@ private fun MathChallengeUi(state: RingingUiState, onSubmit: (String) -> Unit) {
         )
         Spacer(Modifier.height(12.dp))
         Button(onClick = { onSubmit(input); input = "" }, enabled = input.isNotBlank()) {
-            Text("Check")
+            Text(stringResource(R.string.ringing_check))
         }
     }
 }
@@ -145,8 +157,8 @@ private fun ShakeChallengeUi(state: RingingUiState, required: Int, onShake: (Int
         onDispose { detector.stop() }
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Shake your phone", fontSize = 24.sp, color = Color(0xFFE0E0E0))
-        Text("${state.shakeProgress} / $required", fontSize = 40.sp, color = Color(0xFF00E5FF))
+        Text(stringResource(R.string.shake_to_dismiss), fontSize = 24.sp, color = Color(0xFFE0E0E0))
+        Text(stringResource(R.string.ringing_shake_progress, state.shakeProgress, required), fontSize = 40.sp, color = Color(0xFF00E5FF))
         Spacer(Modifier.height(12.dp))
         LinearProgressIndicator(
             progress = { (state.shakeProgress.toFloat() / required).coerceIn(0f, 1f) },
@@ -158,7 +170,7 @@ private fun ShakeChallengeUi(state: RingingUiState, required: Int, onShake: (Int
 @Composable
 private fun SequenceChallengeUi(state: RingingUiState, onTap: (Int) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Tap the numbers in order", color = Color(0xFF9E9E9E))
+        Text(stringResource(R.string.tap_in_order), color = Color(0xFF9E9E9E))
         state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Spacer(Modifier.height(12.dp))
         LazyVerticalGrid(
@@ -185,15 +197,19 @@ private fun SequenceChallengeUi(state: RingingUiState, onTap: (Int) -> Unit) {
 @Composable
 private fun SlideToDismiss(onDismiss: () -> Unit) {
     var dragged by remember { mutableStateOf(0f) }
+    // RTL: the arrow in the label points left, so the gesture must travel left too. Multiplying
+    // the raw delta by the layout direction keeps a single progress value for both directions.
+    val directionSign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .pointerInput(Unit) {
+            .pointerInput(directionSign) {
                 detectHorizontalDragGestures(
                     onDragEnd = { if (dragged < size.width * 0.6f) dragged = 0f },
                     onHorizontalDrag = { _, delta ->
-                        dragged = (dragged + delta).coerceIn(0f, size.width.toFloat())
+                        dragged = (dragged + delta * directionSign)
+                            .coerceIn(0f, size.width.toFloat())
                         if (dragged > size.width * 0.75f) onDismiss()
                     }
                 )
@@ -201,7 +217,7 @@ private fun SlideToDismiss(onDismiss: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            "Slide to dismiss  →",
+            stringResource(R.string.slide_to_dismiss),
             fontSize = 20.sp,
             color = Color(0xFF80CBC4),
             textAlign = TextAlign.Center,

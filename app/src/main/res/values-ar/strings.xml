@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الساعة الرقمية برو</string>
+
+    <!-- ============================== عام ============================== -->
+    <string name="ok">حسنًا</string>
+    <string name="grant">السماح</string>
+    <string name="later">لاحقًا</string>
+    <string name="allow">السماح</string>
+    <string name="remove">إزالة</string>
+    <string name="reset">إعادة ضبط</string>
+    <string name="granted">مُفعَّل</string>
+
+    <!-- ============================== التنقل ============================== -->
+    <string name="nav_clock">الساعة</string>
+    <string name="nav_world">العالم</string>
+    <string name="nav_alarms">المنبّهات</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- ============================== الشاشة الرئيسية ============================== -->
+    <string name="dashboard_no_upcoming_alarm">لا يوجد منبّه قادم</string>
+    <string name="dashboard_tap_to_create">اضغط لإضافة منبّه</string>
+    <string name="dashboard_alarms_count">المنبّهات (%1$d)</string>
+    <string name="dashboard_world">العالم</string>
+    <string name="dashboard_widget_hint">اضغط مطوّلًا على الشاشة الرئيسية ← الأدوات ← الساعة الرقمية برو لإضافة أداة، ثم افتح استوديو الأدوات لتخصيص شكلها.</string>
+
+    <!-- ============================== قائمة المنبّهات ============================== -->
+    <string name="alarm">منبّه</string>
+    <string name="alarms">المنبّهات</string>
+    <string name="add_alarm">إضافة منبّه</string>
+    <string name="next_alarm">المنبّه القادم</string>
+    <string name="no_alarms">لا توجد منبّهات بعد</string>
+    <string name="no_alarms_hint">اضغط + لإنشاء أول منبّه لك.</string>
+    <string name="delete_alarm">حذف المنبّه</string>
+    <string name="repeat_once">مرة واحدة</string>
+    <string name="repeat_every_day">كل يوم</string>
+    <string name="repeat_weekdays">أيام العمل</string>
+    <string name="repeat_weekends">نهاية الأسبوع</string>
+    <string name="challenge_math_short">حساب ×%1$d</string>
+    <string name="challenge_shake_short">هزّ ×%1$d</string>
+    <string name="challenge_memory_short">ذاكرة</string>
+
+    <!-- ============================== محرّر المنبّه ============================== -->
+    <string name="alarm_label">التسمية</string>
+    <string name="alarm_repeat">التكرار</string>
+    <string name="alarm_volume">مستوى الصوت %1$d%%</string>
+    <string name="alarm_volume_ramp">تصاعد الصوت: %1$d ثانية</string>
+    <string name="alarm_snooze_summary">الغفوة: %1$d دقيقة، بحد أقصى %2$d مرات</string>
+    <string name="alarm_vibration">الاهتزاز</string>
+    <string name="alarm_dismiss_challenge">تحدّي الإيقاف</string>
+    <string name="challenge_none">بدون</string>
+    <string name="challenge_math">مسألة حسابية</string>
+    <string name="challenge_shake">هزّ الهاتف</string>
+    <string name="challenge_memory">تسلسل الذاكرة</string>
+    <string name="challenge_problems">عدد المسائل: %1$d • %2$s</string>
+    <string name="challenge_shakes_required">عدد الهزّات المطلوبة: %1$d</string>
+    <string name="difficulty_easy">سهل</string>
+    <string name="difficulty_medium">متوسط</string>
+    <string name="difficulty_hard">صعب</string>
+    <string name="save_alarm">حفظ المنبّه</string>
+
+    <!-- ============================== اختيار النغمة ============================== -->
+    <string name="alarm_sound">نغمة المنبّه</string>
+    <string name="sound_silent">صامت</string>
+    <string name="sound_default">النغمة الافتراضية</string>
+    <string name="sound_bundled_fallback">نغمة مدمجة (تعمل قبل فتح القفل)</string>
+    <string name="sound_imported_header">النغمات المستوردة</string>
+    <string name="sound_device_header">نغمات الجهاز</string>
+    <string name="sound_pick_from_device">اختيار من الجهاز</string>
+    <string name="sound_delete_imported">حذف النغمة المستوردة</string>
+    <string name="sound_missing_warning">لم تعد هذه النغمة متاحة — اختر غيرها وإلا ستُستخدم النغمة الافتراضية.</string>
+    <string name="sound_import_failed">تعذّر استيراد هذا الملف. اختر ملفًا صوتيًا (mp3 أو wav أو ogg أو m4a أو flac) بحجم أقل من 25 ميغابايت.</string>
+    <string name="sound_preview">تشغيل معاينة</string>
+    <string name="sound_preview_stop">إيقاف المعاينة</string>
+    <string name="sound_preview_blocked_ringing">لا يمكن تشغيل المعاينة أثناء رنين منبّه.</string>
+    <string name="sound_preview_failed">تعذّر تشغيل هذه النغمة.</string>
+
+    <!-- ============================== شاشة الرنين ============================== -->
+    <string name="snooze">غفوة</string>
+    <string name="dismiss">إيقاف</string>
+    <string name="snooze_minutes_left">غفوة %1$d دقيقة (بقي %2$d)</string>
+    <string name="no_snoozes_left">لم تتبقَّ غفوات</string>
+    <string name="snoozes_left">بقي %1$d من الغفوات</string>
+    <string name="slide_to_dismiss">اسحب للإيقاف  ←</string>
+    <string name="solve_to_dismiss">حُلّ المسألة لإيقاف المنبّه</string>
+    <string name="ringing_problem_index">المسألة %1$d من %2$d</string>
+    <string name="ringing_check">تحقّق</string>
+    <string name="shake_to_dismiss">هزّ هاتفك</string>
+    <string name="ringing_shake_progress">%1$d / %2$d</string>
+    <string name="tap_in_order">اضغط الأرقام بالترتيب التصاعدي</string>
+
+    <!-- ============================== الساعة العالمية ============================== -->
+    <string name="world_clock">الساعة العالمية</string>
+    <string name="add_city">إضافة مدينة</string>
+    <string name="search_cities">ابحث في أكثر من 10,000 مدينة…</string>
+    <string name="time_travel">السفر عبر الوقت</string>
+    <string name="reset_to_now">الآن</string>
+    <string name="world_now_plus_offset">الآن + الفارق</string>
+    <string name="world_city_subtitle">%1$s • %2$s</string>
+    <string name="world_offset_hours">%1$d س</string>
+    <string name="world_offset_minutes">%1$d د</string>
+    <string name="world_daytime">نهار</string>
+    <string name="world_night">ليل</string>
+
+    <!-- ============================== الإعدادات ============================== -->
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_dynamic_color">ألوان Material You الديناميكية</string>
+    <string name="settings_amoled">أسود AMOLED نقي</string>
+    <string name="settings_24h">نظام 24 ساعة</string>
+    <string name="settings_show_seconds">إظهار الثواني داخل التطبيق</string>
+    <string name="settings_weather">الطقس على الأدوات</string>
+    <string name="settings_celsius">استخدام الدرجة المئوية</string>
+    <string name="settings_keep_screen_on">إبقاء الشاشة مضاءة (الرئيسية)</string>
+    <string name="settings_reliability">موثوقية المنبّه</string>
+    <string name="settings_oem_warning">قد يوقف %1$s المنبّهات في الخلفية — مطلوب إجراء</string>
+    <string name="settings_oem_subtitle">إعدادات توفير البطارية والتشغيل التلقائي</string>
+
+    <!-- ============================== شريط الموثوقية ============================== -->
+    <string name="reliability_broken_title">قد لا ترنّ منبّهاتك</string>
+    <string name="reliability_improve_title">اجعل المنبّهات أكثر موثوقية</string>
+    <string name="reliability_battery_optional">اختياري: إعفاء التطبيق من تحسين البطارية يجعل المنبّهات أكثر موثوقية على الأجهزة ذات توفير الطاقة الصارم.</string>
+    <string name="reliability_allow_notifications">السماح بالإشعارات</string>
+    <string name="reliability_allow_exact_alarms">السماح بالمنبّهات الدقيقة</string>
+    <string name="reliability_allow_fullscreen">السماح بمنبّهات ملء الشاشة</string>
+    <string name="reliability_ignore_battery">تجاهل تحسين البطارية (اختياري)</string>
+    <string name="reliability_issue_notifications">الإشعارات محظورة</string>
+    <string name="reliability_issue_exact_alarms">المنبّهات الدقيقة غير مسموح بها</string>
+    <string name="reliability_issue_fullscreen">منبّهات ملء الشاشة محظورة</string>
+    <string name="reliability_all_good">المنبّهات مُهيّأة بشكل صحيح</string>
+
+    <!-- ============================== دليل إعدادات الشركة المصنّعة ============================== -->
+    <string name="oem_title">اجعل المنبّهات موثوقة على %1$s</string>
+    <string name="oem_device_line">%1$s (%2$s)</string>
+    <string name="oem_intro_restricted">يشغّل هذا النظام أداة إيقاف تطبيقات خاصة به فوق أندرويد. وإلى أن تُنجز الخطوات أدناه، قد تُلغى منبّهاتك أثناء إطفاء الشاشة حتى مع السماح بالمنبّهات الدقيقة.</string>
+    <string name="oem_intro_clean">لم نرصد قيودًا خاصة بالشركة المصنّعة. ومع ذلك، تساعد الخطوات الاختيارية أدناه على زيادة موثوقية المنبّهات.</string>
+    <string name="oem_version_warning">هذه الشاشات تابعة لشركة هاتفك وتتغيّر أماكنها بين إصدارات النظام. إذا لم يفتح أحد الأزرار الصفحة الصحيحة، ابحث في إعدادات النظام عن اسم الإعداد المذكور في كل خطوة. وتعمل المنبّهات دون هذه التعديلات على أندرويد الأصلي.</string>
+    <string name="oem_battery_row">تحسين بطارية أندرويد (اختياري)</string>
+    <string name="oem_open_settings">فتح الإعدادات</string>
+    <string name="oem_unavailable">هذه الشاشة غير متوفّرة في إصدار نظامك — اتّبع الخطوات يدويًا.</string>
+    <string name="oem_test_tip">نصيحة: بعد الانتهاء، اضبط منبّهًا تجريبيًا بعد دقيقتين، ثم أقفل الهاتف واتركه جانبًا. إذا رنّ، فجهازك مُهيّأ بشكل صحيح.</string>
+
+    <string name="vendor_other">جهازك</string>
+
+    <!-- خطوات الشركات المصنّعة -->
+    <string name="oem_miui_autostart_title">تفعيل التشغيل التلقائي</string>
+    <string name="oem_miui_autostart_desc">يمنع نظام MIUI إعادة تشغيل المنبّه بعد إقلاع الهاتف أو بعد إغلاق التطبيق من قائمة التطبيقات الأخيرة.</string>
+    <string name="oem_miui_autostart_steps">الأمان ← الأذونات ← التشغيل التلقائي ← فعّل «الساعة الرقمية برو».</string>
+    <string name="oem_miui_battery_title">اضبط موفّر البطارية على «بدون قيود»</string>
+    <string name="oem_miui_battery_desc">موفّر الطاقة في MIUI مستقل تمامًا عن تحسين البطارية في أندرويد.</string>
+    <string name="oem_miui_battery_steps">ابحث عن «الساعة الرقمية برو» ← موفّر البطارية ← اختر «بدون قيود».</string>
+    <string name="oem_miui_lock_title">تثبيت التطبيق في التطبيقات الأخيرة</string>
+    <string name="oem_miui_lock_desc">يمنع زر «مسح الكل» من إيقاف المنبّه أثناء رنينه.</string>
+    <string name="oem_miui_lock_steps">افتح التطبيقات الأخيرة ← اسحب للأسفل على الساعة الرقمية برو ← اضغط رمز القفل.</string>
+
+    <string name="oem_huawei_startup_title">إدارة تشغيل التطبيق يدويًا</string>
+    <string name="oem_huawei_startup_desc">يغلق نظام EMUI التطبيقات التي يديرها تلقائيًا.</string>
+    <string name="oem_huawei_startup_steps">تشغيل التطبيقات ← أوقف «الإدارة التلقائية» للساعة الرقمية برو ← فعّل المفاتيح الثلاثة (التشغيل التلقائي، التشغيل الثانوي، العمل في الخلفية).</string>
+    <string name="oem_huawei_protected_title">الإضافة إلى التطبيقات المحمية</string>
+    <string name="oem_huawei_protected_desc">يُبقي خدمة المنبّه تعمل أثناء إطفاء الشاشة.</string>
+    <string name="oem_huawei_protected_steps">التطبيقات المحمية ← فعّل الساعة الرقمية برو.</string>
+
+    <string name="oem_samsung_sleeping_title">الإزالة من «التطبيقات النائمة»</string>
+    <string name="oem_samsung_sleeping_desc">يُنيم نظام One UI التطبيقات قليلة الاستخدام، وهو ما يلغي منبّهاتها.</string>
+    <string name="oem_samsung_sleeping_steps">البطارية ← حدود الاستخدام في الخلفية ← تأكّد أن الساعة الرقمية برو ليست ضمن «التطبيقات النائمة» أو «النائمة بعمق».</string>
+    <string name="oem_samsung_care_title">إيقاف «إنامة التطبيقات غير المستخدمة»</string>
+    <string name="oem_samsung_care_desc">تعيد «العناية بالجهاز» إنامة التطبيقات تلقائيًا كل بضعة أيام.</string>
+    <string name="oem_samsung_care_steps">العناية بالجهاز ← البطارية ← حدود الاستخدام في الخلفية ← أوقف «إنامة التطبيقات غير المستخدمة».</string>
+
+    <string name="oem_oppo_startup_title">السماح بالتشغيل التلقائي</string>
+    <string name="oem_oppo_startup_desc">يمنع نظام ColorOS التشغيل في الخلفية بعد إعادة التشغيل.</string>
+    <string name="oem_oppo_startup_steps">مدير التشغيل ← فعّل الساعة الرقمية برو.</string>
+    <string name="oem_oppo_power_title">تعطيل قيود البطارية</string>
+    <string name="oem_oppo_power_desc">اضبط التطبيق على «السماح بالعمل في الخلفية».</string>
+    <string name="oem_oppo_power_steps">موفّر الطاقة ← إدارة بطارية التطبيقات ← الساعة الرقمية برو ← اسمح بالعمل في الخلفية والتشغيل التلقائي.</string>
+
+    <string name="oem_oneplus_chain_title">السماح بالتشغيل التلقائي</string>
+    <string name="oem_oneplus_chain_desc">خيار «التشغيل المتسلسل» في نظام OxygenOS.</string>
+    <string name="oem_oneplus_chain_steps">التشغيل التلقائي ← فعّل الساعة الرقمية برو.</string>
+    <string name="oem_oneplus_battery_title">اضبط البطارية على «عدم التحسين»</string>
+    <string name="oem_oneplus_battery_desc">يجب أيضًا إيقاف التحسين المتقدّم.</string>
+    <string name="oem_oneplus_battery_steps">البطارية ← تحسين البطارية ← الساعة الرقمية برو ← عدم التحسين.</string>
+
+    <string name="oem_vivo_bgstart_title">السماح بالتشغيل في الخلفية</string>
+    <string name="oem_vivo_bgstart_desc">يحجب نظام Funtouch OS التشغيل في الخلفية افتراضيًا.</string>
+    <string name="oem_vivo_bgstart_steps">مدير الأذونات ← التشغيل التلقائي ← فعّل الساعة الرقمية برو.</string>
+    <string name="oem_vivo_whitelist_title">الإضافة إلى قائمة الاستهلاك العالي في الخلفية</string>
+    <string name="oem_vivo_whitelist_desc">يمنع النظام من تجميد خدمة المنبّه.</string>
+    <string name="oem_vivo_whitelist_steps">البطارية ← الاستهلاك العالي في الخلفية ← فعّل الساعة الرقمية برو.</string>
+
+    <string name="oem_asus_autostart_title">تفعيل التشغيل التلقائي</string>
+    <string name="oem_asus_autostart_desc">قائمة التشغيل التلقائي في مدير أجهزة ZenUI.</string>
+    <string name="oem_asus_autostart_steps">مدير الهاتف ← مدير التشغيل التلقائي ← اسمح للساعة الرقمية برو.</string>
+
+    <string name="oem_letv_autoboot_title">تفعيل الإقلاع التلقائي</string>
+    <string name="oem_letv_autoboot_desc">حماية تطبيقات الخلفية في نظام EUI.</string>
+    <string name="oem_letv_autoboot_steps">إدارة الإقلاع التلقائي ← فعّل الساعة الرقمية برو.</string>
+
+    <string name="oem_aosp_battery_title">تحسين بطارية أندرويد</string>
+    <string name="oem_aosp_battery_desc">الإعفاء القياسي المدعوم في كل إصدارات أندرويد.</string>
+    <string name="oem_aosp_battery_steps">اختر «كل التطبيقات» ← الساعة الرقمية برو ← عدم التحسين.</string>
+    <string name="oem_app_details_title">معلومات التطبيق</string>
+    <string name="oem_app_details_desc">وصول يدوي إلى إعدادات الإشعارات والمنبّهات والبطارية.</string>
+    <string name="oem_app_details_steps">استخدم هذا الخيار إذا لم يفتح أيٌّ من الأزرار أعلاه.</string>
+
+    <!-- ============================== استوديو الأدوات ============================== -->
+    <string name="widget_studio">استوديو الأدوات</string>
+    <string name="tab_presets">جاهزة</string>
+    <string name="tab_font">الخط</string>
+    <string name="tab_colors">الألوان</string>
+    <string name="tab_background">الخلفية</string>
+    <string name="tab_layout">التخطيط</string>
+    <string name="tab_tap_actions">إجراءات اللمس</string>
+    <string name="save_widget">حفظ الأداة</string>
+    <string name="studio_bundled_fonts">الخطوط المدمجة (%1$d)</string>
+    <string name="studio_time_size">حجم الوقت: %1$d sp</string>
+    <string name="studio_date_size">حجم التاريخ: %1$d sp</string>
+    <string name="studio_letter_spacing">تباعد الحروف</string>
+    <string name="studio_time_color">لون الوقت</string>
+    <string name="studio_date_color">لون التاريخ</string>
+    <string name="studio_accent_color">اللون المميّز</string>
+    <string name="studio_gradient">تدرّج لوني</string>
+    <string name="studio_gradient_end">نهاية التدرّج</string>
+    <string name="studio_glow">توهّج نيون</string>
+    <string name="studio_glow_radius">نصف قطر التوهّج</string>
+    <string name="studio_shadow">ظل مُسقط</string>
+    <string name="studio_shadow_dx">إزاحة الظل الأفقية</string>
+    <string name="studio_shadow_dy">إزاحة الظل الرأسية</string>
+    <string name="studio_shadow_blur">تمويه الظل</string>
+    <string name="studio_dynamic_color">اتّباع ألوان Material You</string>
+    <string name="studio_background">الخلفية</string>
+    <string name="studio_opacity">الشفافية: %1$d%%</string>
+    <string name="studio_corner_radius">استدارة الزوايا: %1$d dp</string>
+    <string name="studio_frosted">زجاج مُثلّج</string>
+    <string name="studio_border">الإطار</string>
+    <string name="studio_border_color">لون الإطار</string>
+    <string name="studio_border_width">سماكة الإطار</string>
+    <string name="studio_size">الحجم</string>
+    <string name="studio_24h">نظام 24 ساعة</string>
+    <string name="studio_show_seconds">إظهار الثواني</string>
+    <string name="studio_show_ampm">إظهار ص/م</string>
+    <string name="studio_show_date">إظهار التاريخ</string>
+    <string name="studio_date_format">تنسيق التاريخ</string>
+    <string name="studio_battery">مؤشّر البطارية</string>
+    <string name="studio_battery_bar">عرضه كشريط</string>
+    <string name="studio_next_alarm">المنبّه القادم</string>
+    <string name="studio_weather">الطقس</string>
+    <string name="studio_celsius">مئوية</string>
+    <string name="studio_tap_hours">لمس الساعات</string>
+    <string name="studio_tap_minutes">لمس الدقائق</string>
+    <string name="studio_tap_date">لمس التاريخ</string>
+    <string name="studio_tap_weather">لمس الطقس</string>
+
+    <!-- ============================== الأدوات ============================== -->
+    <string name="widget_clock_label">الساعة الرقمية</string>
+    <string name="widget_world_label">الساعة العالمية</string>
+    <string name="widget_glance_label">الساعة الرقمية (Material You)</string>
+    <string name="widget_clock_description">ساعة رقمية قابلة للتخصيص بالكامل مع التاريخ والبطارية والمنبّه القادم والطقس.</string>
+    <string name="widget_world_description">تابع حتى أربع مناطق زمنية في لمحة.</string>
+    <string name="widget_glance_description">ساعة رقمية بنمط Material You تتبع ألوان خلفيتك.</string>
+    <string name="widget_time_desc">الوقت الحالي</string>
+    <string name="widget_info_desc">معلومات التاريخ والبطارية والمنبّه</string>
+
+    <!-- ============================== الإشعارات ============================== -->
+    <string name="channel_alarm_ringing">المنبّهات الرانّة</string>
+    <string name="channel_alarm_ringing_desc">تنبيهات ملء الشاشة أثناء رنين المنبّه.</string>
+    <string name="channel_alarm_upcoming">المنبّهات القادمة</string>
+    <string name="channel_alarm_upcoming_desc">تذكير صامت بموعد منبّهك القادم.</string>
+
+    <!-- ============================== نصوص الأذونات ============================== -->
+    <string name="perm_exact_alarm_title">السماح بالمنبّهات الدقيقة</string>
+    <string name="perm_exact_alarm_body">يحتاج أندرويد إلى إذن لتشغيل منبّهاتك في الثانية المحدّدة بالضبط، حتى في وضع السكون العميق.</string>
+    <string name="perm_notifications_title">السماح بالإشعارات</string>
+    <string name="perm_notifications_body">مطلوب لعرض شاشة المنبّه الكاملة فوق شاشة القفل.</string>
+    <string name="perm_battery_title">تجاهل تحسين البطارية</string>
+    <string name="perm_battery_body">يمنع توفير الطاقة الصارم من تأخير منبّهاتك.</string>
+</resources>

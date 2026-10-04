@@ -169,13 +169,36 @@ canonical-path checks. The SAF read grant is taken persistably only while copyin
 `isPlayable()` warns in the editor when a previously chosen sound has disappeared.
 All of these rules are pure functions in `RingtoneFileRules` with JVM unit tests.
 
-## 6. Permissions
+## 6. Localization & RTL
+
+All user-facing copy lives in `res/values/strings.xml`, with a hand-written Arabic translation in
+`res/values-ar/strings.xml` (key parity is enforced; only genuinely untranslatable values — format
+patterns, separators and brand names — carry `translatable="false"`).
+
+Two patterns keep the logic locale-agnostic:
+* `TopLevelDestination` and `OemPowerSettings.Vendor` hold `@StringRes` ids instead of text;
+* `AlarmReliabilityStatus.issues` returns a list of string **ids**, so the data class stays a pure
+  JVM type and remains unit-testable while the UI renders it in the current locale.
+
+RTL: `supportsRtl="true"`, no `Left`/`Right`/absolute modifiers anywhere, and the slide-to-dismiss
+gesture on the ringing screen mirrors its direction from `LocalLayoutDirection`, so the swipe
+follows the arrow in both LTR and RTL.
+
+## 7. Ringtone preview
+
+`RingtonePreviewPlayer` is a separate `MediaPlayer`-based singleton — never `AlarmSoundPlayer`,
+which is owned by `AlarmService` and may be mid-ramp on a live alarm. It plays at most 8 seconds,
+stops itself on completion or timeout, stops when another sound is selected, when the alarm is
+saved, and when the editor leaves the composition (`DisposableEffect`), and refuses to start at all
+while `AlarmSessionManager.isRinging` is true.
+
+## 8. Permissions
 
 `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, `POST_NOTIFICATIONS`, `USE_FULL_SCREEN_INTENT`,
 `RECEIVE_BOOT_COMPLETED`, `VIBRATE`, `WAKE_LOCK`, `FOREGROUND_SERVICE`,
 `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, `FOREGROUND_SERVICE_SPECIAL_USE`, `INTERNET` (weather, optional).
 
-## 7. Build & run
+## 9. Build & run
 
 ```bash
 # Android Studio Ladybug+ : File ▸ Open ▸ this folder, then Run ▸ app

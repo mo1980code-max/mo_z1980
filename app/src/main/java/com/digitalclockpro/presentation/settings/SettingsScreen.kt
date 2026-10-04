@@ -28,6 +28,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.digitalclockpro.core.util.OemPowerSettings
 import com.digitalclockpro.domain.model.ThemeMode
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +45,7 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            "Appearance",
+            stringResource(R.string.settings_appearance),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -56,27 +59,34 @@ fun SettingsScreen(
             }
         }
 
-        SwitchRow("Material You dynamic color", prefs.dynamicColor, viewModel::setDynamicColor)
-        SwitchRow("AMOLED pure black", prefs.amoledBlack, viewModel::setAmoled)
-        SwitchRow("24-hour format", prefs.use24Hour, viewModel::set24Hour)
-        SwitchRow("Show seconds in app", prefs.showSecondsInApp, viewModel::setShowSeconds)
-        SwitchRow("Weather on widgets", prefs.weatherEnabled, viewModel::setWeatherEnabled)
-        SwitchRow("Use °C", prefs.weatherCelsius, viewModel::setCelsius)
-        SwitchRow("Keep screen on (dashboard)", prefs.keepScreenOnDashboard, viewModel::setKeepScreenOn)
+        SwitchRow(stringResource(R.string.settings_dynamic_color), prefs.dynamicColor, viewModel::setDynamicColor)
+        SwitchRow(stringResource(R.string.settings_amoled), prefs.amoledBlack, viewModel::setAmoled)
+        SwitchRow(stringResource(R.string.settings_24h), prefs.use24Hour, viewModel::set24Hour)
+        SwitchRow(stringResource(R.string.settings_show_seconds), prefs.showSecondsInApp, viewModel::setShowSeconds)
+        SwitchRow(stringResource(R.string.settings_weather), prefs.weatherEnabled, viewModel::setWeatherEnabled)
+        SwitchRow(stringResource(R.string.settings_celsius), prefs.weatherCelsius, viewModel::setCelsius)
+        SwitchRow(stringResource(R.string.settings_keep_screen_on), prefs.keepScreenOnDashboard, viewModel::setKeepScreenOn)
 
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
         Text(
-            "Reliability",
+            stringResource(R.string.settings_reliability),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
         ListItem(
-            headlineContent = { Text("Make alarms reliable on ${OemPowerSettings.vendor.displayName}") },
+            headlineContent = {
+                Text(
+                    stringResource(
+                        R.string.oem_title,
+                        OemPowerSettings.vendorLabel(LocalContext.current)
+                    )
+                )
+            },
             supportingContent = {
                 Text(
                     if (OemPowerSettings.requiresManualWhitelisting)
-                        "${OemPowerSettings.romName} can kill background alarms — action needed"
-                    else "Battery optimization and autostart settings"
+                        stringResource(R.string.settings_oem_warning, OemPowerSettings.romName)
+                    else stringResource(R.string.settings_oem_subtitle)
                 )
             },
             leadingContent = { Icon(Icons.Filled.BatteryAlert, contentDescription = null) },

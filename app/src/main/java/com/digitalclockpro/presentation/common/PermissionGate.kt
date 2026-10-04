@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
 
 /**
  * Surfaces the three settings that silently break alarms when missing:
@@ -110,21 +112,23 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
             FlowRow(verticalArrangement = Arrangement.Center) {
                 Icon(Icons.Filled.WarningAmber, contentDescription = null)
                 Text(
-                    if (status.requiredGranted) "  Make alarms more reliable"
-                    else "  Your alarms may not ring",
+                    "  " + if (status.requiredGranted) {
+                        stringResource(R.string.reliability_improve_title)
+                    } else {
+                        stringResource(R.string.reliability_broken_title)
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                text = status.explanation,
+                text = status.explanationText(),
                 style = MaterialTheme.typography.bodyMedium
             )
             if (!status.batteryOptimizationIgnored) {
                 Text(
-                    text = "Optional: exempting the app from battery optimization makes alarms " +
-                        "more reliable on aggressive power-saving devices.",
+                    text = stringResource(R.string.reliability_battery_optional),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -141,7 +145,7 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
                                 context.appDetailsSettingsIntent()
                             )
                         }
-                    }) { Text("Allow notifications") }
+                    }) { Text(stringResource(R.string.reliability_allow_notifications)) }
                 }
                 if (!status.exactAlarmsGranted) {
                     FilledTonalButton(onClick = {
@@ -149,7 +153,7 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
                             context.exactAlarmSettingsIntent(),
                             context.appDetailsSettingsIntent()
                         )
-                    }) { Text("Allow exact alarms") }
+                    }) { Text(stringResource(R.string.reliability_allow_exact_alarms)) }
                 }
                 if (!status.fullScreenIntentAllowed) {
                     FilledTonalButton(onClick = {
@@ -157,7 +161,7 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
                             context.fullScreenIntentSettingsIntent(),
                             context.appDetailsSettingsIntent()
                         )
-                    }) { Text("Allow full-screen alarms") }
+                    }) { Text(stringResource(R.string.reliability_allow_fullscreen)) }
                 }
                 if (!status.batteryOptimizationIgnored) {
                     // Optional, and only ever launched from this explicit user tap.
@@ -166,7 +170,7 @@ fun AlarmPermissionBanner(modifier: Modifier = Modifier) {
                             context.ignoreBatteryOptimizationsIntent(),
                             Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                         )
-                    }) { Text("Ignore battery optimizations (optional)") }
+                    }) { Text(stringResource(R.string.reliability_ignore_battery)) }
                 }
             }
         }
@@ -194,14 +198,36 @@ data class AlarmReliabilityStatus(
     /** Nothing at all left to suggest — hides the banner completely. */
     val allSatisfied: Boolean get() = requiredGranted && batteryOptimizationIgnored
 
-    val explanation: String
+    /**
+     * String resources for the missing required items, in display order.
+     *
+     * Resource **ids** rather than text so the data class stays free of Android resources and
+     * remains unit-testable, while the UI resolves them in the current locale.
+     */
+    val issues: List<Int>
         get() = buildList {
-            if (!notificationsGranted) add("notifications are blocked")
-            if (!exactAlarmsGranted) add("exact alarms are not allowed")
-            if (!fullScreenIntentAllowed) add("full-screen alarms are blocked")
-        }.joinToString(", ")
-            .ifBlank { "Alarms are set up correctly" }
-            .replaceFirstChar { it.uppercase() } + "."
+            if (!notificationsGranted) add(R.string.reliability_issue_notifications)
+            if (!exactAlarmsGranted) add(R.string.reliability_issue_exact_alarms)
+            if (!fullScreenIntentAllowed) add(R.string.reliability_issue_fullscreen)
+        }
+}
+
+/**
+ * Builds the human sentence for [AlarmReliabilityStatus.issues].
+ *
+ * Capitalisation is done with the current locale; Arabic has no case, so
+ * `replaceFirstChar` is a no-op there rather than a corruption.
+ */
+@Composable
+fun AlarmReliabilityStatus.explanationText(): String {
+    if (issues.isEmpty()) {
+        return stringResource(R.string.reliability_all_good) +
+            stringResource(R.string.reliability_sentence_end)
+    }
+    val separator = stringResource(R.string.reliability_list_separator)
+    val sentence = issues.joinToString(separator) { stringResource(it) }
+    return sentence.replaceFirstChar { it.uppercase() } +
+        stringResource(R.string.reliability_sentence_end)
 }
 
 fun Context.readAlarmReliabilityStatus() = AlarmReliabilityStatus(

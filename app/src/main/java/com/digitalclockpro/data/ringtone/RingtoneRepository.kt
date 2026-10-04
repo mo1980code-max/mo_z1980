@@ -35,7 +35,8 @@ data class AlarmSound(
          */
         const val SILENT_URI = "silent://none"
 
-        fun silent() = AlarmSound(SILENT_URI, "Silent", Source.SILENT)
+        /** Title is intentionally empty: the UI renders a localized label for silence. */
+        fun silent() = AlarmSound(SILENT_URI, "", Source.SILENT)
     }
 }
 
@@ -229,13 +230,13 @@ class RingtoneRepository @Inject constructor(
 
     fun defaultAlarmSound(): AlarmSound = AlarmSound(
         uri = systemDefaultAlarmUri()?.toString(),
-        title = "Default alarm sound",
+        title = context.getString(R.string.sound_default),
         source = AlarmSound.Source.SYSTEM
     )
 
     fun bundledFallbackSound(): AlarmSound = AlarmSound(
         uri = bundledFallbackUri,
-        title = "Built-in beep (works before unlock)",
+        title = context.getString(R.string.sound_bundled_fallback),
         source = AlarmSound.Source.SYSTEM
     )
 

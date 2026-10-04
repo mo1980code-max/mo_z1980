@@ -46,6 +46,8 @@ import com.digitalclockpro.presentation.common.rememberCurrentTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.math.abs
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
 
 @Composable
 fun WorldClockScreen(viewModel: WorldClockViewModel = hiltViewModel()) {
@@ -54,7 +56,7 @@ fun WorldClockScreen(viewModel: WorldClockViewModel = hiltViewModel()) {
     val results by viewModel.searchResults.collectAsStateWithLifecycle()
     val liveNow by rememberCurrentTime(withSeconds = false)
 
-    // Time-travel: the whole screen renders at "now + offset".
+    // Time-travel: the whole screen renders at stringResource(R.string.world_now_plus_offset).
     val reference = liveNow.plusMinutes(state.travelOffsetMinutes.toLong())
 
     Column(Modifier.fillMaxSize()) {
@@ -63,7 +65,7 @@ fun WorldClockScreen(viewModel: WorldClockViewModel = hiltViewModel()) {
             onValueChange = viewModel::onQueryChange,
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            placeholder = { Text("Search 10,000+ cities…") },
+            placeholder = { Text(stringResource(R.string.search_cities)) },
             singleLine = true
         )
 
@@ -72,7 +74,7 @@ fun WorldClockScreen(viewModel: WorldClockViewModel = hiltViewModel()) {
                 items(results, key = { it.cityName + it.zoneId }) { entry ->
                     ListItem(
                         headlineContent = { Text(entry.cityName) },
-                        supportingContent = { Text("${entry.country} • ${entry.zoneId}") },
+                        supportingContent = { Text(stringResource(R.string.world_city_subtitle, entry.country, entry.zoneId)) },
                         modifier = Modifier.clickable { viewModel.onAddCity(entry) }
                     )
                 }
@@ -121,15 +123,19 @@ private fun TimeTravelSlider(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (offsetMinutes == 0) "Now"
-                else buildString {
-                    append(if (offsetMinutes > 0) "+" else "−")
-                    append("${abs(offsetMinutes) / 60}h ")
-                    append("${abs(offsetMinutes) % 60}m")
-                } + "  →  " + TimeFormatters.formatTime(reference, use24Hour, false),
+                text = if (offsetMinutes == 0) {
+                    stringResource(R.string.reset_to_now)
+                } else {
+                    val sign = if (offsetMinutes > 0) "+" else "\u2212"
+                    val hours = stringResource(R.string.world_offset_hours, abs(offsetMinutes) / 60)
+                    val minutes =
+                        stringResource(R.string.world_offset_minutes, abs(offsetMinutes) % 60)
+                    val time = TimeFormatters.formatTime(reference, use24Hour, false)
+                    "$sign$hours $minutes  \u2192  $time"
+                },
                 style = MaterialTheme.typography.titleMedium
             )
-            TextButton(onClick = onReset, enabled = offsetMinutes != 0) { Text("Reset") }
+            TextButton(onClick = onReset, enabled = offsetMinutes != 0) { Text(stringResource(R.string.reset)) }
         }
         Slider(
             value = offsetMinutes.toFloat(),
@@ -173,7 +179,7 @@ private fun CityCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = if (day) Icons.Filled.LightMode else Icons.Filled.DarkMode,
-                        contentDescription = if (day) "Daytime" else "Night",
+                        contentDescription = if (day) stringResource(R.string.world_daytime) else stringResource(R.string.world_night),
                         tint = Color.White
                     )
                     Text(
@@ -197,7 +203,7 @@ private fun CityCard(
                 fontSize = 28.sp
             )
             IconButton(onClick = onRemove) {
-                Icon(Icons.Filled.Delete, contentDescription = "Remove", tint = Color.White)
+                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.remove), tint = Color.White)
             }
         }
     }

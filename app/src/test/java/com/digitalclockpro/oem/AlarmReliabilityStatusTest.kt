@@ -1,5 +1,6 @@
 package com.digitalclockpro.oem
 
+import com.digitalclockpro.R
 import com.digitalclockpro.presentation.common.AlarmReliabilityStatus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,7 +23,8 @@ class AlarmReliabilityStatusTest {
         assertTrue(s.requiredGranted)
         // …but the banner still offers the optional hardening step.
         assertFalse(s.allSatisfied)
-        assertEquals("Alarms are set up correctly.", s.explanation)
+        // Nothing required is missing, so there is no issue text to show.
+        assertTrue(s.issues.isEmpty())
     }
 
     @Test
@@ -38,12 +40,22 @@ class AlarmReliabilityStatusTest {
     }
 
     @Test
-    fun `explanation lists every missing required item`() {
+    fun `issues list every missing required item in display order`() {
+        // Resource ids, not text: the data class is locale-agnostic and the UI resolves them,
+        // which is what makes the Arabic translation work without touching this logic.
         assertEquals(
-            "Notifications are blocked, exact alarms are not allowed, " +
-                "full-screen alarms are blocked.",
+            listOf(
+                R.string.reliability_issue_notifications,
+                R.string.reliability_issue_exact_alarms,
+                R.string.reliability_issue_fullscreen
+            ),
             status(notifications = false, exact = false, fullScreen = false, battery = false)
-                .explanation
+                .issues
         )
+    }
+
+    @Test
+    fun `battery optimization never appears as an issue`() {
+        assertTrue(status(battery = false).issues.isEmpty())
     }
 }

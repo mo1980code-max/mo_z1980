@@ -46,9 +46,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.digitalclockpro.core.util.OemPowerSettings
 import com.digitalclockpro.presentation.common.ignoreBatteryOptimizationsIntent
 import com.digitalclockpro.presentation.common.isIgnoringBatteryOptimizations
+import androidx.compose.ui.res.stringResource
+import com.digitalclockpro.R
 
 /**
- * "Make alarms reliable on <vendor>" guide.
+ * Per-vendor autostart / power-management guide.
  *
  * None of these vendor restrictions can be read or toggled through a public API, so the screen is
  * a checklist: each step explains what to do, deep-links straight into the vendor Activity when it
@@ -103,25 +105,26 @@ fun OemSetupScreen(viewModel: OemSetupViewModel = hiltViewModel()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.BatteryAlert, contentDescription = null)
                         Text(
-                            "  ${OemPowerSettings.vendor.displayName} (${OemPowerSettings.romName})",
+                            "  " + stringResource(
+                                R.string.oem_device_line,
+                                OemPowerSettings.vendorLabel(context),
+                                OemPowerSettings.romName
+                            ),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
                         if (OemPowerSettings.requiresManualWhitelisting) {
-                            "This ROM runs its own app killer on top of Android. Until the steps " +
-                                "below are done, your alarms can be cancelled while the screen " +
-                                "is off — even with exact alarms granted."
+                            stringResource(R.string.oem_intro_restricted)
                         } else {
-                            "No vendor-specific restrictions detected. The optional steps below " +
-                                "can still make alarms more resilient."
+                            stringResource(R.string.oem_intro_clean)
                         },
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        OemPowerSettings.VERSION_VARIANCE_WARNING,
+                        stringResource(R.string.oem_version_warning),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -130,9 +133,9 @@ fun OemSetupScreen(viewModel: OemSetupViewModel = hiltViewModel()) {
 
         item {
             StatusRow(
-                label = "Android battery optimization (optional)",
+                label = stringResource(R.string.oem_battery_row),
                 satisfied = batteryExempt,
-                actionLabel = "Allow",
+                actionLabel = stringResource(R.string.allow),
                 // Only ever launched from this explicit tap – never automatically on screen entry.
                 onAction = { open(context.ignoreBatteryOptimizationsIntent()) }
             )
@@ -149,8 +152,7 @@ fun OemSetupScreen(viewModel: OemSetupViewModel = hiltViewModel()) {
 
         item {
             Text(
-                "Tip: after finishing, set a test alarm 2 minutes ahead, lock the phone and put it " +
-                    "aside. If it rings, your device is configured correctly.",
+                stringResource(R.string.oem_test_tip),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
@@ -182,7 +184,7 @@ private fun StatusRow(
                 Text("  $label")
             }
             if (!satisfied) Button(onClick = onAction) { Text(actionLabel) }
-            else Text("Granted", color = MaterialTheme.colorScheme.primary)
+            else Text(stringResource(R.string.granted), color = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -215,11 +217,11 @@ private fun OemStepCard(
             if (action.available) {
                 OutlinedButton(onClick = onOpen) {
                     Icon(Icons.Filled.OpenInNew, contentDescription = null)
-                    Text("  Open settings")
+                    Text("  " + stringResource(R.string.oem_open_settings))
                 }
             } else {
                 Text(
-                    "This screen is not available on your ROM version — follow the steps manually.",
+                    stringResource(R.string.oem_unavailable),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )

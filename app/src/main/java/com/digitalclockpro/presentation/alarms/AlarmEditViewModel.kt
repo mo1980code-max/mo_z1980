@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.digitalclockpro.data.ringtone.AlarmSound
+import com.digitalclockpro.data.ringtone.RingtonePreviewPlayer
 import com.digitalclockpro.data.ringtone.RingtoneRepository
 import com.digitalclockpro.domain.model.Alarm
 import com.digitalclockpro.domain.model.DismissChallenge
@@ -31,6 +32,7 @@ class AlarmEditViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
     private val preferencesRepository: PreferencesRepository,
     private val ringtoneRepository: RingtoneRepository,
+    private val previewPlayer: RingtonePreviewPlayer,
     private val saveAlarm: SaveAlarmUseCase
 ) : ViewModel() {
 
@@ -43,6 +45,9 @@ class AlarmEditViewModel @Inject constructor(
 
     private val _sounds = MutableStateFlow(SoundPickerState())
     val sounds: StateFlow<SoundPickerState> = _sounds.asStateFlow()
+
+    /** Uri currently being auditioned in the picker (null = nothing playing). */
+    val previewingUri: StateFlow<String?> = previewPlayer.previewingUri
 
     init {
         refreshSounds()
@@ -76,7 +81,34 @@ class AlarmEditViewModel @Inject constructor(
         viewModelScope.launch { verifyCurrentSound() }
     }
 
-    fun selectSound(sound: AlarmSound) = setSound(sound.uri, sound.title)
+    /** Selecting another sound always silences the running preview first. */
+    fun selectSound(sound: AlarmSound) {
+        previewPlayer.stop()
+        setSound(sound.uri, sound.title)
+    }
+
+    /**
+     * Auditions [sound] for a few seconds. Tapping the playing item again stops it.
+     * Refuses to play while a real alarm is ringing and surfaces that as an inline message.
+     */
+    fun previewSound(sound: AlarmSound) {
+        val message = when (previewPlayer.preview(sound.uri)) {
+            RingtonePreviewPlayer.Result.AlarmRinging -> PreviewIssue.ALARM_RINGING
+            is RingtonePreviewPlayer.Result.Failed -> PreviewIssue.FAILED
+            else -> null
+        }
+        _sounds.update { it.copy(previewIssue = message) }
+    }
+
+    fun stopPreview() = previewPlayer.stop()
+
+    fun dismissPreviewIssue() = _sounds.update { it.copy(previewIssue = null) }
+
+    /** Why a preview could not be played; mapped to a string resource by the UI. */
+    enum class PreviewIssue { ALARM_RINGING, FAILED }
+
+    /** Why an import was rejected; mapped to a string resource by the UI. */
+    enum class ImportIssue { FAILED }
 
     /**
      * Imports a user-picked audio file by **copying it into app storage**, so the alarm keeps
@@ -90,8 +122,7 @@ class AlarmEditViewModel @Inject constructor(
             _sounds.update {
                 it.copy(
                     importing = false,
-                    importError = "Could not import this file. Pick an audio file " +
-                        "(mp3, wav, ogg, m4a, flac) smaller than 25 MB."
+                    importError = ImportIssue.FAILED
                 )
             }
             return@launch
@@ -103,6 +134,7 @@ class AlarmEditViewModel @Inject constructor(
 
     fun deleteImported(sound: AlarmSound) = viewModelScope.launch {
         val uri = sound.uri ?: return@launch
+        if (previewingUri.value == uri) previewPlayer.stop()
         if (ringtoneRepository.deleteImported(uri)) {
             if (_alarm.value.soundUri == uri) {
                 val fallback = ringtoneRepository.defaultAlarmSound()
@@ -138,12 +170,20 @@ class AlarmEditViewModel @Inject constructor(
         val system: List<AlarmSound> = emptyList(),
         val imported: List<AlarmSound> = emptyList(),
         val importing: Boolean = false,
-        val importError: String? = null,
-        val currentSoundMissing: Boolean = false
+        val importError: ImportIssue? = null,
+        val currentSoundMissing: Boolean = false,
+        val previewIssue: PreviewIssue? = null
     )
 
     fun save(onDone: () -> Unit) = viewModelScope.launch {
+        previewPlayer.stop()
         saveAlarm(_alarm.value.copy(enabled = true, currentSnoozeCount = 0))
         onDone()
+    }
+
+    /** Leaving the editor (back, process death, config change teardown) silences the preview. */
+    override fun onCleared() {
+        previewPlayer.stop()
+        super.onCleared()
     }
 }

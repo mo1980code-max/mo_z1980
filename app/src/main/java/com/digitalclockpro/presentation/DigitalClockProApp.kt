@@ -23,6 +23,7 @@ import com.digitalclockpro.presentation.navigation.TopLevelDestination
 import com.digitalclockpro.presentation.settings.SettingsScreen
 import com.digitalclockpro.presentation.settings.oem.OemSetupScreen
 import com.digitalclockpro.presentation.world.WorldClockScreen
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun DigitalClockProApp(startDestination: TopLevelDestination) {
@@ -44,8 +45,13 @@ fun DigitalClockProApp(startDestination: TopLevelDestination) {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(destination.icon, contentDescription = destination.label) },
-                            label = { Text(destination.label) }
+                            icon = {
+                                Icon(
+                                    destination.icon,
+                                    contentDescription = stringResource(destination.labelRes)
+                                )
+                            },
+                            label = { Text(stringResource(destination.labelRes)) }
                         )
                     }
                 }

@@ -1,17 +1,24 @@
 package com.digitalclockpro.presentation.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WatchLater
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.digitalclockpro.R
 
-enum class TopLevelDestination(val route: String, val label: String, val icon: ImageVector) {
-    DASHBOARD("dashboard", "Clock", Icons.Filled.WatchLater),
-    WORLD("world", "World", Icons.Filled.Public),
-    ALARMS("alarms", "Alarms", Icons.Filled.Alarm),
-    SETTINGS("settings", "Settings", Icons.Filled.Settings);
+enum class TopLevelDestination(
+    val route: String,
+    /** Localized label; resolved with `stringResource` at the call site. */
+    @StringRes val labelRes: Int,
+    val icon: ImageVector
+) {
+    DASHBOARD("dashboard", R.string.nav_clock, Icons.Filled.WatchLater),
+    WORLD("world", R.string.nav_world, Icons.Filled.Public),
+    ALARMS("alarms", R.string.nav_alarms, Icons.Filled.Alarm),
+    SETTINGS("settings", R.string.nav_settings, Icons.Filled.Settings);
 
     companion object {
         fun fromRoute(route: String?): TopLevelDestination =
