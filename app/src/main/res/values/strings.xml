@@ -317,6 +317,7 @@
     <string name="widget_battery_percent" translatable="false">%1$d%%</string>
 
     <!-- ============================== Desk clock ============================== -->
+    <string name="desk_date_pattern" translatable="false">EEEE, MMMM d</string>
     <string name="desk_clock">Desk clock</string>
     <string name="desk_tap_for_analog">Tap for analog</string>
     <string name="desk_tap_for_digital">Tap for digital</string>

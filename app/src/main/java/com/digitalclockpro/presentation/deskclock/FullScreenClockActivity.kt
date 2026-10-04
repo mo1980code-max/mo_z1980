@@ -202,7 +202,7 @@ private fun DeskClockScreen(
                 )
             } else {
                 Text(
-                    text = TimeFormatters.formatTime(now, use24Hour = false, showSeconds = true),
+                    text = TimeFormatters.formatTime(now, use24h = false, showSeconds = true),
                     fontSize = 86.sp,
                     fontFamily = FontFamily.Monospace,
                     color = Color(0xFF00E5FF)
@@ -212,7 +212,7 @@ private fun DeskClockScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = TimeFormatters.formatDate(now, "EEEE, MMMM d"),
+                text = TimeFormatters.formatDate(now, stringResource(R.string.desk_date_pattern)),
                 fontSize = 20.sp,
                 color = Color(0xFF9E9E9E)
             )
