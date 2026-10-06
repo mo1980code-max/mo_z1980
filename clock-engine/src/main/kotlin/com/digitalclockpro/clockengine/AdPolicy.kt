@@ -113,6 +113,21 @@ object AdPolicy {
     fun allowsAppOpenAd(origin: AdLaunchOrigin, surface: AdSurface): Boolean =
         origin != AdLaunchOrigin.ALARM && allowsAds(surface)
 
+    /**
+     * Rewarded eligibility — the single, deliberate exception to the ad-free surfaces
+     * (class doc, rule 3). True ONLY when BOTH hold:
+     *
+     *  - the surface is [AdSurface.CHESS_CLOCK] — no other surface has a rewarded door — and
+     *  - the engine reports the game [ChessClockEngine.Phase.FINISHED], so every clock is
+     *    already frozen and there is no live game left to interrupt.
+     *
+     * During play (IDLE / RUNNING / PAUSED) this is false for every surface, the chess clock
+     * included. Widening this door — another surface, another phase — is a product decision
+     * that must arrive with its own tests, like every other rule in this file.
+     */
+    fun allowsRewardedAd(surface: AdSurface, phase: ChessClockEngine.Phase): Boolean =
+        surface == AdSurface.CHESS_CLOCK && phase == ChessClockEngine.Phase.FINISHED
+
     // --------------------------------------------------------------------- IDs
     //
     // Google's OFFICIAL test identifiers (sample AdMob account used by every Google guide:
@@ -120,7 +135,7 @@ object AdPolicy {
     // https://developers.google.com/admob/android/app-open). They always serve test ads,
     // never charge advertisers and cannot get the account flagged for invalid traffic.
     // The app id mirrors the `com.google.android.gms.ads.APPLICATION_ID` meta-data in
-    // AndroidManifest.xml — keep the two in sync. Replace ALL THREE (plus the manifest
+    // AndroidManifest.xml — keep the two in sync. Replace ALL FOUR (plus the manifest
     // entry) with the production AdMob ids before a Play Store release; see docs/ADS.md.
 
     /** Test AdMob **app** id (note the `~` separator). Mirrors the manifest meta-data. */
@@ -131,4 +146,7 @@ object AdPolicy {
 
     /** Test ad unit for the app-open format. */
     const val TEST_APP_OPEN_AD_UNIT_ID = "ca-app-pub-3940256099942544/9257395921"
+
+    /** Test ad unit for the rewarded format (chess post-game summary unlock). */
+    const val TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"
 }

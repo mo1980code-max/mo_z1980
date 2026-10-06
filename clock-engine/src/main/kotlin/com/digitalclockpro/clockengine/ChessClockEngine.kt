@@ -22,6 +22,17 @@ object ChessClockEngine {
     enum class Phase { IDLE, RUNNING, PAUSED, FINISHED }
 
     /**
+     * Why a finished game ended. A clock cannot see checkmate — it knows time, and it knows
+     * when both players agree to stop.
+     */
+    enum class EndReason {
+        /** The player on move ran their clock to zero. */
+        TIME_OUT,
+        /** The game was ended early; the player on move conceded. */
+        RESIGN
+    }
+
+    /**
      * The four controls real tournaments use.
      *
      * [SIMPLE_DELAY] and [BRONSTEIN] are **not** the same mechanism even though they are often
@@ -58,7 +69,15 @@ object ChessClockEngine {
     data class PlayerState(
         /** Time banked at the last settle point; the live value comes from [remaining]. */
         val storedMillis: Long,
-        val moves: Int = 0
+        val moves: Int = 0,
+        /**
+         * Total time this player has actually been **charged** across the whole game — the sum
+         * of every settled turn, delay discounts included. Unlike [storedMillis] it never
+         * decreases (increments and refunds do not pad it), which is what makes it the honest
+         * "thinking time" the post-game summary reports. Maintained by [settle]; frozen once
+         * the game is [Phase.FINISHED].
+         */
+        val spentMillis: Long = 0L
     )
 
     data class State(
@@ -70,7 +89,9 @@ object ChessClockEngine {
         /** Monotonic instant at which the current turn began. Meaningless unless RUNNING. */
         val turnStartedAtElapsed: Long = 0L,
         /** Who ran out of time, once the game is over. */
-        val flagged: Player? = null
+        val flagged: Player? = null,
+        /** How the game ended; null while it has not. */
+        val endedBy: EndReason? = null
     ) {
         val isRunning: Boolean get() = phase == Phase.RUNNING
         val totalMoves: Int get() = a.moves + b.moves
@@ -79,6 +100,32 @@ object ChessClockEngine {
 
         internal fun withPlayer(side: Player, value: PlayerState): State =
             if (side == Player.A) copy(a = value) else copy(b = value)
+    }
+
+    /**
+     * The post-game report [summarize] produces. Numbers only — names, plurals and units are
+     * the presentation layer's job, the same rule the rest of this module follows.
+     */
+    data class GameSummary(
+        val control: TimeControl,
+        val winner: Player,
+        val loser: Player,
+        val endedBy: EndReason,
+        val a: PlayerTally,
+        val b: PlayerTally
+    ) {
+        data class PlayerTally(
+            val moves: Int,
+            val spentMillis: Long,
+            /** Banked time at the end; zero for the player who flagged. */
+            val remainingMillis: Long
+        ) {
+            /** Mean charged time per completed move; null when no move was completed. */
+            val averageMillisPerMove: Long? get() = if (moves > 0) spentMillis / moves else null
+        }
+
+        /** Active playing time: both players' charged thinking time combined. */
+        val activeMillis: Long get() = a.spentMillis + b.spentMillis
     }
 
     // ------------------------------------------------------------------ queries
@@ -103,6 +150,24 @@ object ChessClockEngine {
     ): Boolean {
         if (state.phase == Phase.IDLE) return false
         return remaining(state, side, nowElapsed) <= thresholdMillis
+    }
+
+    /**
+     * Freezes the finished game into a [GameSummary]. Null unless the game is actually over —
+     * the UI treats a non-null result as the only thing worth putting on a game-over screen,
+     * and it is the *reward* the post-game rewarded ad unlocks.
+     */
+    fun summarize(state: State): GameSummary? {
+        if (state.phase != Phase.FINISHED) return null
+        val loser = state.flagged ?: return null
+        return GameSummary(
+            control = state.control,
+            winner = loser.opponent,
+            loser = loser,
+            endedBy = state.endedBy ?: EndReason.TIME_OUT,
+            a = GameSummary.PlayerTally(state.a.moves, state.a.spentMillis, state.a.storedMillis),
+            b = GameSummary.PlayerTally(state.b.moves, state.b.spentMillis, state.b.storedMillis)
+        )
     }
 
     /**
@@ -196,6 +261,23 @@ object ChessClockEngine {
         return state.copy(phase = Phase.RUNNING, turnStartedAtElapsed = nowElapsed)
     }
 
+    /**
+     * Ends the game early, resignation-style: the player **on move** is recorded as the loser.
+     *
+     * A clock cannot see checkmate or a formal resignation — but players of a casual game want
+     * the same end-of-game flow (result screen, post-game summary) when they agree to stop, and
+     * "the player to move conceded" is the convention this records. The running turn is settled
+     * first so the tally charges every millisecond actually used. Ignored unless a game is in
+     * progress, so a stray call can never end an idle or already-finished board.
+     */
+    fun finish(state: State, nowElapsed: Long): State {
+        if (state.phase != Phase.RUNNING && state.phase != Phase.PAUSED) return state
+        val loser = state.active ?: return state
+        val settled = settle(state, nowElapsed)
+        if (settled.phase == Phase.FINISHED) return settled // they ran out while ending it
+        return settled.copy(phase = Phase.FINISHED, flagged = loser, endedBy = EndReason.RESIGN)
+    }
+
     /** Call from the UI frame loop; the only place a flag fall is noticed while nobody presses. */
     fun tick(state: State, nowElapsed: Long): State {
         if (state.phase != Phase.RUNNING) return state
@@ -206,17 +288,24 @@ object ChessClockEngine {
 
     /**
      * Charges the active player for the time used so far and re-bases the turn at [nowElapsed].
-     * Marks the game finished if that exhausts their clock.
+     * Marks the game finished if that exhausts their clock. Also adds the charge to the
+     * player's `spentMillis` tally, so the post-game summary can be derived from the state alone.
      */
     private fun settle(state: State, nowElapsed: Long): State {
         val side = state.active ?: return state
         val left = remaining(state, side, nowElapsed)
         val updated = state
-            .withPlayer(side, state.player(side).copy(storedMillis = left))
+            .withPlayer(
+                side,
+                state.player(side).copy(
+                    storedMillis = left,
+                    spentMillis = state.player(side).spentMillis + consumedThisTurn(state, nowElapsed)
+                )
+            )
             .copy(turnStartedAtElapsed = nowElapsed)
 
         return if (left <= 0L) {
-            updated.copy(phase = Phase.FINISHED, flagged = side)
+            updated.copy(phase = Phase.FINISHED, flagged = side, endedBy = EndReason.TIME_OUT)
         } else {
             updated
         }

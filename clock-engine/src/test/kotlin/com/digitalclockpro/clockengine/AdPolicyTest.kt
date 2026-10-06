@@ -135,6 +135,47 @@ class AdPolicyTest {
         assertFalse(AdPolicy.allowsAppOpenAd(AdLaunchOrigin.WIDGET, AdSurface.DESK_CLOCK))
     }
 
+    // ------------------------------------------------------------- rewarded ad
+
+    @Test
+    fun `a rewarded ad is allowed only on the chess clock and only after the game finished`() {
+        assertTrue(
+            AdPolicy.allowsRewardedAd(AdSurface.CHESS_CLOCK, ChessClockEngine.Phase.FINISHED)
+        )
+    }
+
+    @Test
+    fun `no phase of a live chess game ever allows a rewarded ad`() {
+        listOf(
+            ChessClockEngine.Phase.IDLE,
+            ChessClockEngine.Phase.RUNNING,
+            ChessClockEngine.Phase.PAUSED
+        ).forEach { phase ->
+            assertFalse(
+                "a rewarded ad leaked into live play ($phase)",
+                AdPolicy.allowsRewardedAd(AdSurface.CHESS_CLOCK, phase)
+            )
+        }
+    }
+
+    @Test
+    fun `no surface other than the chess clock may show a rewarded ad - even when finished`() {
+        AdSurface.entries.filter { it != AdSurface.CHESS_CLOCK }.forEach { surface ->
+            assertFalse(
+                "a rewarded ad leaked onto $surface",
+                AdPolicy.allowsRewardedAd(surface, ChessClockEngine.Phase.FINISHED)
+            )
+        }
+    }
+
+    @Test
+    fun `the chess clock still bans banners and app open ads while allowing the post-game reward`() {
+        // The rewarded door is an exception to ad-FREE, not to the ban on interruptive formats:
+        // nothing unsolicited may ever appear on the chess clock.
+        assertFalse(AdPolicy.allowsBanner(AdSurface.CHESS_CLOCK))
+        assertFalse(AdPolicy.allowsAppOpenAd(AdLaunchOrigin.NORMAL, AdSurface.CHESS_CLOCK))
+    }
+
     // ------------------------------------------------------------- test ids
 
     @Test
@@ -142,9 +183,11 @@ class AdPolicyTest {
         // App id:      https://developers.google.com/admob/android/quick-start
         // Banner:      https://developers.google.com/admob/android/test-ads (anchored adaptive)
         // App open:    https://developers.google.com/admob/android/app-open
+        // Rewarded:    https://developers.google.com/admob/android/test-ads (rewarded)
         assertEquals("ca-app-pub-3940256099942544~3347511713", AdPolicy.TEST_APP_ID)
         assertEquals("ca-app-pub-3940256099942544/9214589741", AdPolicy.TEST_BANNER_AD_UNIT_ID)
         assertEquals("ca-app-pub-3940256099942544/9257395921", AdPolicy.TEST_APP_OPEN_AD_UNIT_ID)
+        assertEquals("ca-app-pub-3940256099942544/5224354917", AdPolicy.TEST_REWARDED_AD_UNIT_ID)
     }
 
     @Test
@@ -153,7 +196,8 @@ class AdPolicyTest {
         listOf(
             AdPolicy.TEST_APP_ID,
             AdPolicy.TEST_BANNER_AD_UNIT_ID,
-            AdPolicy.TEST_APP_OPEN_AD_UNIT_ID
+            AdPolicy.TEST_APP_OPEN_AD_UNIT_ID,
+            AdPolicy.TEST_REWARDED_AD_UNIT_ID
         ).forEach { id ->
             assertTrue("$id is not a Google test id", id.startsWith(officialTestPublisher))
         }
@@ -169,5 +213,7 @@ class AdPolicyTest {
         assertFalse(AdPolicy.TEST_BANNER_AD_UNIT_ID.contains('~'))
         assertTrue(AdPolicy.TEST_APP_OPEN_AD_UNIT_ID.contains('/'))
         assertFalse(AdPolicy.TEST_APP_OPEN_AD_UNIT_ID.contains('~'))
+        assertTrue(AdPolicy.TEST_REWARDED_AD_UNIT_ID.contains('/'))
+        assertFalse(AdPolicy.TEST_REWARDED_AD_UNIT_ID.contains('~'))
     }
 }
