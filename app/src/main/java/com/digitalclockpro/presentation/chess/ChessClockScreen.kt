@@ -1,5 +1,6 @@
 package com.digitalclockpro.presentation.chess
 
+import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
@@ -23,6 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -30,6 +33,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,14 +42,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -61,6 +68,7 @@ import com.digitalclockpro.clockengine.ChessClockEngine
 import com.digitalclockpro.clockengine.ChessClockEngine.Phase
 import com.digitalclockpro.clockengine.ChessClockEngine.Player
 import com.digitalclockpro.clockengine.ChessClockEngine.TimeControlType
+import kotlinx.coroutines.delay
 
 /**
  * A two-sided tournament clock.
@@ -74,8 +82,44 @@ fun ChessClockScreen(viewModel: ChessClockViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val now by viewModel.now.collectAsStateWithLifecycle()
     val prefs by viewModel.prefs.collectAsStateWithLifecycle()
+    val summaryUnlocked by viewModel.summaryUnlocked.collectAsStateWithLifecycle()
+    val adUnavailable by viewModel.adUnavailableNotice.collectAsStateWithLifecycle()
 
     var showSettings by remember { mutableStateOf(false) }
+    var confirmEndGame by remember { mutableStateOf(false) }
+
+    // The rewarded ad needs a host activity; the chess tab is always composed inside one.
+    val activity = LocalContext.current as? Activity
+
+    // ---- game-over flow -------------------------------------------------------
+    // The result dialog appears only 1.5 s AFTER the game has frozen: a flag fall is a
+    // physical moment two people are still tapping through, and a dialog popping over the
+    // last press is exactly how accidental taps happen. Both flags survive rotation (the
+    // user's dismissal must not be un-done by turning the screen), and are re-armed the
+    // moment a new game starts (the phase leaves FINISHED).
+    var showResult by rememberSaveable { mutableStateOf(false) }
+    var resultDismissed by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(state.phase) {
+        when (state.phase) {
+            Phase.FINISHED -> if (!resultDismissed) {
+                delay(GAME_OVER_DELAY_MILLIS)
+                showResult = true
+            }
+            else -> {
+                showResult = false
+                resultDismissed = false
+            }
+        }
+    }
+
+    // The gentle "no ad right now" notice is transient: it clears itself after a few seconds
+    // so the dialog never paints itself into a corner while offline.
+    if (adUnavailable) {
+        LaunchedEffect(Unit) {
+            delay(AD_NOTICE_MILLIS)
+            viewModel.clearAdUnavailableNotice()
+        }
+    }
 
     // A chess clock is useless if the screen sleeps mid-game. This is a window flag, not a
     // wake lock: the system drops it the moment the screen leaves the foreground.
@@ -104,7 +148,8 @@ fun ChessClockScreen(viewModel: ChessClockViewModel = hiltViewModel()) {
             onPauseResume = viewModel::pauseOrResume,
             onReset = viewModel::reset,
             onToggleSound = viewModel::toggleSound,
-            onOpenSettings = { showSettings = true }
+            onOpenSettings = { showSettings = true },
+            onEndGame = { confirmEndGame = true }
         )
 
         // ---- near side ----
@@ -125,6 +170,212 @@ fun ChessClockScreen(viewModel: ChessClockViewModel = hiltViewModel()) {
             onDismiss = { showSettings = false }
         )
     }
+
+    if (confirmEndGame) {
+        EndGameConfirmDialog(
+            onConfirm = {
+                confirmEndGame = false
+                viewModel.endGame()
+            },
+            onDismiss = { confirmEndGame = false }
+        )
+    }
+
+    if (showResult) {
+        GameOverDialog(
+            state = state,
+            summaryUnlocked = summaryUnlocked,
+            adUnavailable = adUnavailable,
+            onWatchAd = { activity?.let(viewModel::requestMatchSummary) },
+            onRematch = viewModel::reset,
+            onClose = {
+                showResult = false
+                resultDismissed = true
+            }
+        )
+    }
+}
+
+// ---------------------------------------------------------------------- game over
+
+/**
+ * The end-of-game dialog: the result first, then the **opt-in** rewarded offer — and, once the
+ * reward has actually been earned through `onUserEarnedReward`, the match summary it paid for.
+ * No ad is ever started from here without an explicit tap, and nothing about the offer blocks
+ * the result or the rematch. Whether an ad may exist at all is
+ * [com.digitalclockpro.clockengine.AdPolicy]'s decision, enforced inside
+ * [com.digitalclockpro.ads.RewardedAdManager]; this composable only renders what survived it.
+ */
+@Composable
+private fun GameOverDialog(
+    state: ChessClockEngine.State,
+    summaryUnlocked: Boolean,
+    adUnavailable: Boolean,
+    onWatchAd: () -> Unit,
+    onRematch: () -> Unit,
+    onClose: () -> Unit
+) {
+    val summary = ChessClockEngine.summarize(state)
+
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(stringResource(R.string.chess_game_over)) },
+        text = {
+            Column {
+                if (summary == null) {
+                    // Unreachable while the dialog is gated on FINISHED — but a summary-less
+                    // game over still deserves a result line, never a crash.
+                    Text(stringResource(R.string.chess_flagged))
+                } else {
+                    val winnerName = stringResource(
+                        if (summary.winner == Player.A) R.string.chess_player_a
+                        else R.string.chess_player_b
+                    )
+                    Text(
+                        text = stringResource(
+                            if (summary.endedBy == ChessClockEngine.EndReason.RESIGN)
+                                R.string.chess_win_by_resignation
+                            else R.string.chess_win_on_time,
+                            winnerName
+                        ),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    if (!summaryUnlocked) {
+                        // ---- the offer: a clear trade, never an interruption ----
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(R.string.chess_watch_ad_for_summary),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (adUnavailable) {
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.chess_ad_not_ready),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    } else {
+                        // ---- the earned reward ----
+                        Spacer(Modifier.height(12.dp))
+                        SummaryCard(summary)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (summaryUnlocked || summary == null) {
+                TextButton(onClick = onRematch) {
+                    Text(stringResource(R.string.chess_reset))
+                }
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // The way out stays one tap away whether or not the user watches anything.
+                    TextButton(onClick = onRematch) {
+                        Text(stringResource(R.string.chess_reset))
+                    }
+                    Button(onClick = onWatchAd) {
+                        Icon(
+                            Icons.Filled.EmojiEvents,
+                            contentDescription = null,
+                            modifier = Modifier.height(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.chess_watch_ad_cta))
+                    }
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onClose) { Text(stringResource(R.string.chess_close)) }
+        }
+    )
+}
+
+/**
+ * The reward: a compact two-column tally of the finished game. Numbers come straight from the
+ * pure [ChessClockEngine.summarize]; every label is translated like everywhere else.
+ */
+@Composable
+private fun SummaryCard(summary: ChessClockEngine.GameSummary) {
+    Column {
+        Text(
+            text = stringResource(R.string.chess_summary_title),
+            style = MaterialTheme.typography.titleSmall
+        )
+        Spacer(Modifier.height(8.dp))
+
+        SummaryRow(
+            label = "",
+            a = stringResource(R.string.chess_player_a),
+            b = stringResource(R.string.chess_player_b)
+        )
+        SummaryRow(
+            label = stringResource(R.string.chess_summary_moves),
+            a = summary.a.moves.toString(),
+            b = summary.b.moves.toString()
+        )
+        SummaryRow(
+            label = stringResource(R.string.chess_summary_avg_move),
+            a = formatSeconds(summary.a.averageMillisPerMove),
+            b = formatSeconds(summary.b.averageMillisPerMove)
+        )
+        SummaryRow(
+            label = stringResource(R.string.chess_summary_time_left),
+            a = formatClock(summary.a.remainingMillis),
+            b = formatClock(summary.b.remainingMillis)
+        )
+
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.chess_summary_duration) +
+                ": " + formatClock(summary.activeMillis),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun SummaryRow(label: String, a: String, b: String) {
+    Row(Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1.4f)
+        )
+        Text(
+            text = a,
+            style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = b,
+            style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun EndGameConfirmDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.chess_end_game)) },
+        text = { Text(stringResource(R.string.chess_end_game_confirm)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text(stringResource(R.string.chess_end_game)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        }
+    )
 }
 
 // ---------------------------------------------------------------------- player half
@@ -230,7 +481,8 @@ private fun ControlBar(
     onPauseResume: () -> Unit,
     onReset: () -> Unit,
     onToggleSound: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onEndGame: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -251,6 +503,15 @@ private fun ControlBar(
                     if (state.phase == Phase.RUNNING) R.string.chess_pause else R.string.chess_resume
                 )
             )
+        }
+
+        // Early end (resignation-style): confirmation-gated because it destroys a running
+        // game, and disabled unless one actually is.
+        IconButton(
+            onClick = onEndGame,
+            enabled = state.phase == Phase.RUNNING || state.phase == Phase.PAUSED
+        ) {
+            Icon(Icons.Filled.Flag, contentDescription = stringResource(R.string.chess_end_game))
         }
 
         IconButton(onClick = onReset) {
@@ -419,6 +680,23 @@ private fun spokenTime(millis: Long): String {
     val seconds = total % 60
     return "$minutes:%02d".format(seconds)
 }
+
+/**
+ * One decimal of seconds for the summary's per-move average — "3.5", locale digits, no unit
+ * (the row label already says what it is). Null (no completed moves) reads as a dash.
+ */
+private fun formatSeconds(millis: Long?): String =
+    millis?.let { "%.1f".format(it / 1000.0) } ?: "\u2014"
+
+/**
+ * The pause between "the game froze" and "the result dialog appears". Long enough that the
+ * last, frantic tap of a flag fall cannot land on the dialog instead of the board; short
+ * enough that the result still feels instant.
+ */
+private const val GAME_OVER_DELAY_MILLIS = 1_500L
+
+/** How long the friendly "no ad available" notice stays up before clearing itself. */
+private const val AD_NOTICE_MILLIS = 4_000L
 
 @StringRes
 private fun presetLabel(preset: ChessClockEngine.Preset): Int = when (preset) {

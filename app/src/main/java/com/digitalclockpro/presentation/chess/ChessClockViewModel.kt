@@ -1,8 +1,11 @@
 package com.digitalclockpro.presentation.chess
 
+import android.app.Activity
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.digitalclockpro.ads.RewardedAdManager
+import com.digitalclockpro.clockengine.AdSurface
 import com.digitalclockpro.clockengine.ChessClockEngine
 import com.digitalclockpro.data.sound.ChessClockFeedback
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +25,8 @@ data class ChessClockPrefs(
 
 @HiltViewModel
 class ChessClockViewModel @Inject constructor(
-    private val feedback: ChessClockFeedback
+    private val feedback: ChessClockFeedback,
+    private val rewardedAds: RewardedAdManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -36,6 +40,19 @@ class ChessClockViewModel @Inject constructor(
     /** Re-emitted every frame so the two clocks redraw without duplicating their value in state. */
     private val _now = MutableStateFlow(SystemClock.elapsedRealtime())
     val now: StateFlow<Long> = _now.asStateFlow()
+
+    /**
+     * The reward: the post-game summary stays hidden until the user has *earned* it by
+     * watching the rewarded ad through to `onUserEarnedReward`. Lives here — not in composable
+     * state — so a rotation mid-ad cannot lose something the user already paid for with their
+     * time. Cleared the moment a new game begins.
+     */
+    private val _summaryUnlocked = MutableStateFlow(false)
+    val summaryUnlocked: StateFlow<Boolean> = _summaryUnlocked.asStateFlow()
+
+    /** True right after the ad proved unavailable; the UI shows a gentle notice and clears it. */
+    private val _adUnavailableNotice = MutableStateFlow(false)
+    val adUnavailableNotice: StateFlow<Boolean> = _adUnavailableNotice.asStateFlow()
 
     private var tickJob: Job? = null
 
@@ -86,12 +103,14 @@ class ChessClockViewModel @Inject constructor(
     fun reset() {
         _state.value = ChessClockEngine.reset(_state.value.control)
         warned.clear()
+        clearGameRewardState()
         ensureTicking()
     }
 
     fun applyPreset(preset: ChessClockEngine.Preset) {
         _state.value = ChessClockEngine.setControl(_state.value, preset.control)
         warned.clear()
+        clearGameRewardState()
         ensureTicking()
     }
 
@@ -103,7 +122,48 @@ class ChessClockViewModel @Inject constructor(
         )
         _state.value = ChessClockEngine.setControl(_state.value, control)
         warned.clear()
+        clearGameRewardState()
         ensureTicking()
+    }
+
+    /**
+     * Resignation-style early end, from the "End game" control. The engine settles and freezes
+     * both clocks; the game-over dialog (and with it the rewarded offer) follows from the
+     * FINISHED phase exactly as it does after a flag fall.
+     */
+    fun endGame() {
+        _state.value = ChessClockEngine.finish(_state.value, SystemClock.elapsedRealtime())
+        ensureTicking() // cancels the loop: nothing is running any more
+    }
+
+    /**
+     * The user tapped "watch an ad" on the game-over dialog. Everything about whether an ad
+     * may appear is [com.digitalclockpro.clockengine.AdPolicy]'s call, made inside
+     * [RewardedAdManager.showIfEligible]; this only maps the two outcomes onto UI state:
+     * the reward is granted strictly from `onUserEarnedReward`, and every "no ad" path raises
+     * the gentle notice instead of blocking anything.
+     *
+     * The [activity] is used transiently to host the full-screen ad and is never stored.
+     */
+    fun requestMatchSummary(activity: Activity) {
+        rewardedAds.showIfEligible(
+            activity = activity,
+            surface = AdSurface.CHESS_CLOCK,
+            phase = _state.value.phase,
+            onUserEarnedReward = { _summaryUnlocked.value = true },
+            onAdUnavailable = { _adUnavailableNotice.value = true }
+        )
+    }
+
+    /** Called by the UI once its "no ad right now" notice has been on screen long enough. */
+    fun clearAdUnavailableNotice() {
+        _adUnavailableNotice.value = false
+    }
+
+    /** A new game is a clean slate: last game's reward and notice do not carry over. */
+    private fun clearGameRewardState() {
+        _summaryUnlocked.value = false
+        _adUnavailableNotice.value = false
     }
 
     fun toggleSound() = _prefs.update { it.copy(soundEnabled = !it.soundEnabled) }

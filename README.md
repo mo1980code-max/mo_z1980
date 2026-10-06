@@ -147,9 +147,15 @@ BootReceiver: BOOT_COMPLETED | LOCKED_BOOT_COMPLETED | MY_PACKAGE_REPLACED | TIM
 
 * **Test IDs only** (Google's official sample account): App ID `…~3347511713` in the manifest
   `com.google.android.gms.ads.APPLICATION_ID` meta-data, anchored-adaptive banner `…/9214589741`,
-  app-open `…/9257395921` — all pinned as constants in `AdPolicy` and asserted verbatim by tests.
+  app-open `…/9257395921`, rewarded `…/5224354917` — all pinned as constants in `AdPolicy` and
+  asserted verbatim by tests.
 * **Ad-free forever** on: alarm ringing screen, desk clock, chess clock, alarm editor, OEM guide,
   widgets (+ widget studio). On those surfaces no `AdView` is even constructed.
+* **One declared exception**: a *user-initiated* rewarded ad on the chess clock, offered only
+  from the game-over dialog once both clocks are frozen (`AdPolicy.allowsRewardedAd` requires
+  `CHESS_CLOCK` + `Phase.FINISHED` — never during live play). It unlocks the post-game match
+  summary; the reward is granted strictly from `onUserEarnedReward`, and a missing ad degrades
+  to a gentle, self-clearing notice (`RewardedAdManager`).
 * **App-open ad never shows when the open came from an alarm** (full-screen intent, alarm
   notification, status-bar alarm icon) — `EXTRA_FROM_ALARM` → `AdLaunchOrigin.ALARM` → veto in
   `AdPolicy.allowsAppOpenAd()`.

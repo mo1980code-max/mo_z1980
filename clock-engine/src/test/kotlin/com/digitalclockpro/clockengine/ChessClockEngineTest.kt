@@ -312,4 +312,100 @@ class ChessClockEngineTest {
         assertEquals(76_000L, s.a.storedMillis)
         assertEquals(76_000L, s.b.storedMillis)
     }
+
+    // ------------------------------------------------- thinking-time tally
+
+    @Test
+    fun `thinking time is tallied per player as turns are settled`() {
+        var s = started(suddenDeath, at = 0L)            // A on move
+        s = ChessClockEngine.press(s, Player.A, 5_000L)  // A thought 5s
+        s = ChessClockEngine.press(s, Player.B, 12_000L) // B thought 7s
+        assertEquals(5_000L, s.a.spentMillis)
+        assertEquals(7_000L, s.b.spentMillis)
+    }
+
+    @Test
+    fun `paused time is never charged to anybody`() {
+        var s = started(suddenDeath, at = 0L)            // A on move
+        s = ChessClockEngine.press(s, Player.A, 5_000L)  // B on move now
+        s = ChessClockEngine.pause(s, 8_000L)            // B charged the 3s so far
+        s = ChessClockEngine.resume(s, 60_000L)          // 52s of paused silence
+        s = ChessClockEngine.press(s, Player.B, 61_000L) // B presses 1s after resume
+        assertEquals(0L, s.a.spentMillis)
+        assertEquals(3_000L + 1_000L, s.b.spentMillis)   // only real thinking counts
+    }
+
+    @Test
+    fun `a simple delay is free thinking time in the tally too`() {
+        var s = started(simpleDelay, at = 0L)            // A on move, 3s delay
+        s = ChessClockEngine.press(s, Player.A, 2_000L)  // pressed inside the delay window
+        assertEquals(0L, s.a.spentMillis)
+        s = ChessClockEngine.press(s, Player.B, 8_000L)  // B used 6s of which 3 were free
+        assertEquals(3_000L, s.b.spentMillis)
+    }
+
+    // ------------------------------------------------- early finish (resign)
+
+    @Test
+    fun `finishing early is a resignation by the player on move`() {
+        var s = started(suddenDeath, at = 0L)            // A on move
+        s = ChessClockEngine.press(s, Player.A, 5_000L)   // B on move
+        val done = ChessClockEngine.finish(s, 12_000L)    // B concedes after 7s
+        assertEquals(Phase.FINISHED, done.phase)
+        assertEquals(Player.B, done.flagged)
+        assertEquals(ChessClockEngine.EndReason.RESIGN, done.endedBy)
+        assertEquals(5_000L, done.a.spentMillis)
+        assertEquals(7_000L, done.b.spentMillis)
+    }
+
+    @Test
+    fun `finish is ignored unless a game is actually in progress`() {
+        val idle = ChessClockEngine.reset(suddenDeath)
+        assertSame(idle, ChessClockEngine.finish(idle, 100L))
+        val finished = ChessClockEngine.finish(started(suddenDeath), 5_000L)
+        assertSame(finished, ChessClockEngine.finish(finished, 6_000L))
+    }
+
+    @Test
+    fun `finishing at the exact moment the clock hits zero is a loss on time`() {
+        var s = started(suddenDeath, at = 0L)
+        s = ChessClockEngine.press(s, Player.A, 5_000L)   // B on move with 60s
+        val done = ChessClockEngine.finish(s, 65_000L)    // B's clock empties right now
+        assertEquals(Phase.FINISHED, done.phase)
+        assertEquals(ChessClockEngine.EndReason.TIME_OUT, done.endedBy)
+    }
+
+    // ------------------------------------------------- the flag-fall summary
+
+    @Test
+    fun `a flag fall ends the game as a loss on time and settles the final charge`() {
+        var s = started(suddenDeath, at = 0L)
+        s = ChessClockEngine.press(s, Player.A, 5_000L)   // B on move with 60s
+        val done = ChessClockEngine.tick(s, 65_000L)      // B burns the whole clock
+        assertEquals(Phase.FINISHED, done.phase)
+        assertEquals(Player.B, done.flagged)
+        assertEquals(ChessClockEngine.EndReason.TIME_OUT, done.endedBy)
+        assertEquals(60_000L, done.b.spentMillis)
+    }
+
+    @Test
+    fun `the summary describes the finished game and nothing else`() {
+        assertNull(ChessClockEngine.summarize(started(suddenDeath)))
+
+        var s = started(suddenDeath, at = 0L)
+        s = ChessClockEngine.press(s, Player.A, 5_000L)   // A: 1 move, 5s, 55s left
+        val done = ChessClockEngine.finish(s, 12_000L)    // B resigns after 7s
+
+        val summary = ChessClockEngine.summarize(done)!!
+        assertEquals(Player.A, summary.winner)
+        assertEquals(Player.B, summary.loser)
+        assertEquals(ChessClockEngine.EndReason.RESIGN, summary.endedBy)
+        assertEquals(1, summary.a.moves)
+        assertEquals(0, summary.b.moves)
+        assertEquals(55_000L, summary.a.remainingMillis)
+        assertEquals(53_000L, summary.b.remainingMillis)
+        assertEquals(12_000L, summary.activeMillis)        // 5s + 7s of real play
+        assertEquals(5_000L, summary.a.averageMillisPerMove)
+        assertNull(summary.b.averageMillisPerMove)         // no completed move
+    }
 }

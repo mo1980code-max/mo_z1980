@@ -40,13 +40,16 @@ import javax.inject.Singleton
  *  3. Preloads and shows the app-open ad on app foregrounding, but only when
  *     [AdPolicy.allowsAppOpenAd] says so — an alarm-triggered open or an ad-free surface
  *     never sees one.
+ *  4. Kicks off the rewarded preload the moment the SDK is initialized — [RewardedAdManager]
+ *     owns everything rewarded from there on, under its own [AdPolicy] gate.
  *
  * Threading: every entry point is the main thread (activity callbacks, UMP callbacks and the
  * Mobile Ads callbacks all arrive there).
  */
 @Singleton
 class AdsController @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val rewardedAds: RewardedAdManager
 ) : Application.ActivityLifecycleCallbacks, DefaultLifecycleObserver {
 
     private val mainHandler = Handler(Looper.getMainLooper())
